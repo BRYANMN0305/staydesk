@@ -344,12 +344,11 @@ const tabTitulos = {
 
 const vistas = ['dashboard', 'usuarios', 'pisos', 'huespedes', 'habitaciones', 'reservas', 'servicios', 'facturas', 'reportes']
 
-const initialTab = route.params.vista || sessionStorage.getItem('activeTab') || 'dashboard'
+const initialTab = route.params.vista || 'dashboard'
 const activeTab = ref(initialTab)
 
 const setTab = (tab) => {
   activeTab.value = tab
-  sessionStorage.setItem('activeTab', tab)
   router.replace(`/${tab}`)
 }
 
@@ -576,7 +575,7 @@ onMounted(async () => {
     cargarEstadisticas()
     cargarFacturas()
   }
-  if (!vistas.includes(route.params.vista)) {
+  if (route.params.vista && !vistas.includes(route.params.vista)) {
     router.replace('/dashboard')
   }
 })
