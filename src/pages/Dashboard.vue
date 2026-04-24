@@ -124,8 +124,8 @@
               No hay habitaciones registradas.
             </div>
             <div v-else class="row g-2 g-md-3">
-              <div class="col-6 col-sm-4 col-lg-3 col-xl-2" v-for="room in filteredRooms" :key="room.id">
-                <Habitacion_Card v-bind="room" @click="selectRoom(room)" />
+              <div class="rooms-grid">
+                <Habitacion_Card v-for="room in filteredRooms" :key="room.id" v-bind="room" @click="selectRoom(room)" />
               </div>
             </div>
           </div>
@@ -597,6 +597,24 @@ onMounted(async () => {
 .topbar {
   height: 68px;
   border-color: rgba(99, 32, 238, 0.08) !important;
+}
+
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 992px) {
+  .rooms-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .rooms-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .search-wrap {
