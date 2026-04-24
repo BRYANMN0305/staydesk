@@ -125,37 +125,34 @@
                   <span class="text-muted" style="font-size:12px">{{ h.documento }}</span>
                 </div>
               </div>
-              <div class="d-flex gap-2 align-items-center">
+              <div class="d-flex flex-column align-items-end gap-1">
                 <span class="badge-estado" :class="esInactivo(h) ? 'inactivo' : 'activo'">
                   {{ esInactivo(h) ? 'Inactivo' : 'Activo' }}
                 </span>
-                <button v-if="!esInactivo(h)" class="action-btn edit-btn" @click="abrirModalEditar(h)">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                  </svg>
-                </button>
-                <button v-if="!esInactivo(h)" class="action-btn delete-btn" @click="confirmarEliminar(h)">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6" />
-                    <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
-                    <path d="M10 11v6M14 11v6" />
-                    <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
-                  </svg>
-                </button>
-                <button v-else class="action-btn reactivar-btn" @click="confirmarReactivar(h)"
-                  :disabled="reactivando === h.id_huesped" style="font-size:12px;padding:4px 10px">
-                  Reactivar
-                </button>
               </div>
             </div>
-            <div class="d-flex gap-3" style="font-size:12px;color:#6b7280">
+
+            <div class="d-flex gap-3 mb-2" style="font-size:12px;color:#6b7280">
               <span>📞 {{ h.telefono || '—' }}</span>
               <span class="text-truncate">✉️ {{ h.email || '—' }}</span>
             </div>
+
+            <div class="d-flex gap-2">
+              <button v-if="!esInactivo(h)" class="action-btn edit-btn flex-grow-1" @click="abrirModalEditar(h)">
+                Editar
+              </button>
+              <button v-if="!esInactivo(h)" class="action-btn delete-btn flex-grow-1" @click="confirmarEliminar(h)">
+                Eliminar
+              </button>
+              <button v-if="esInactivo(h)" class="action-btn reactivar-btn w-100" @click="confirmarReactivar(h)"
+                :disabled="reactivando === h.id_huesped">
+                <span v-if="reactivando === h.id_huesped" class="spinner-border spinner-border-sm me-1"
+                  role="status"></span>
+                {{ reactivando === h.id_huesped ? 'Reactivando...' : 'Reactivar' }}
+              </button>
+            </div>
           </div>
         </div>
-
       </template>
 
       <!-- Banner inactivos -->
@@ -308,9 +305,19 @@ const abrirModalEditar = (h) => {
 
 const cerrarModal = () => { modalAbierto.value = false }
 
+const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/
+
 const guardar = async (datos) => {
   if (!datos.nombre || !datos.apellido) {
     errorModal.value = 'Nombre y apellido son obligatorios.'
+    return
+  }
+  if (!soloLetras.test(datos.nombre)) {
+    errorModal.value = 'El nombre no puede contener números.'
+    return
+  }
+  if (!soloLetras.test(datos.apellido)) {
+    errorModal.value = 'El apellido no puede contener números.'
     return
   }
   if (!modoEdicion.value && !datos.documento) {
