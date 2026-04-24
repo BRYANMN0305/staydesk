@@ -451,6 +451,7 @@ onMounted(() => {
   font-family: 'Outfit', sans-serif;
   box-shadow: 0 4px 14px rgba(99, 32, 238, 0.3);
   transition: all .2s;
+  white-space: nowrap;   /* ← evita que el texto se parta en dos líneas */
 }
 
 .btn-primary-custom:hover {
