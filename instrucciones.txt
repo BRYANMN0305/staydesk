@@ -1,0 +1,8 @@
+//instalar vue router
+npm install vue-router
+
+//instalat bootstrap
+npm install bootstrap
+
+//Ejecutar en local
+npm run dev
