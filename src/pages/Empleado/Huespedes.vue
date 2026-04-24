@@ -133,8 +133,8 @@
             </div>
 
             <div class="d-flex gap-3 mb-2" style="font-size:12px;color:#6b7280">
-              <span>{{ h.telefono || '—' }}</span>
-              <span class="text-truncate">{{ h.email || '—' }}</span>
+              <span>Telefono: {{ h.telefono || '—' }}</span>
+              <span class="text-truncate">Email: {{ h.email || '—' }}</span>
             </div>
 
             <div class="d-flex gap-2">
