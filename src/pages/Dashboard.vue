@@ -549,7 +549,7 @@ const handleLogout = () => {
 }
 
 const filteredRooms = computed(() => {
-  if (!searchQuery.value) return rooms.value.slice(0, 18)
+  if (!searchQuery.value) return rooms.value.slice(0, 12)
   return rooms.value.filter(r =>
     r.number?.toString().includes(searchQuery.value) ||
     r.type?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
