@@ -1,6 +1,6 @@
 <template>
     <div class="d-flex align-items-center gap-3">
-        <img src="../assets/icons/Logo.png" alt="StayDesk" width="48" height="48" />
+        <img src="../assets/icons/LogoS.PNG" alt="StayDesk" width="48" height="48" />
         <div>
             <div>
                 <span class="logo-stay">Stay</span><span class="logo-desk">Desk</span>
