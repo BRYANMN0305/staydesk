@@ -12,7 +12,8 @@
           </span>
         </div>
 
-        <div class="d-flex align-items-center gap-2 flex-wrap">
+        <!-- ✅ CAMBIO: flex-wrap → flex-shrink-0 -->
+        <div class="d-flex align-items-center gap-2 flex-shrink-0">
           <button class="toggle-desactivadas d-none d-md-inline-flex" :class="{ activo: mostrarDesactivadas }"
             @click="mostrarDesactivadas = !mostrarDesactivadas">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -86,7 +87,6 @@
               </svg>
               Editar precio
             </button>
-
 
             <button class="action-btn delete-btn w-100 mt-1" :disabled="esDesactivada(h)" @click="confirmarEliminar(h)">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -451,12 +451,20 @@ onMounted(() => {
   font-family: 'Outfit', sans-serif;
   box-shadow: 0 4px 14px rgba(99, 32, 238, 0.3);
   transition: all .2s;
-  white-space: nowrap;   /* ← evita que el texto se parta en dos líneas */
+  white-space: nowrap;
 }
 
 .btn-primary-custom:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 18px rgba(99, 32, 238, 0.4);
+}
+
+/* ✅ AÑADIDO: reduce padding en móvil para que quepa bien */
+@media (max-width: 576px) {
+  .btn-primary-custom {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
 }
 
 .toggle-desactivadas {
