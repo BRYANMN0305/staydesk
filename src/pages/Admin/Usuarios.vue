@@ -295,9 +295,27 @@ const cerrarModal = () => {
   modalAbierto.value = false
 }
 
+const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/
+
 const guardar = async (datos) => {
   guardando.value = true
   errorModal.value = ''
+
+  if (!datos.nombre || !datos.apellido) {
+    errorModal.value = 'Nombre y apellido son obligatorios.'
+    guardando.value = false
+    return
+  }
+  if (!soloLetras.test(datos.nombre)) {
+    errorModal.value = 'El nombre no puede contener números.'
+    guardando.value = false
+    return
+  }
+  if (!soloLetras.test(datos.apellido)) {
+    errorModal.value = 'El apellido no puede contener números.'
+    guardando.value = false
+    return
+  }
 
   try {
     let res
