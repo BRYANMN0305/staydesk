@@ -1,6 +1,6 @@
 export default class AuthService {
     async login(email, password) {
-        const res = await fetch('https://staydesk-apis.duckdns.org/iniciar_sesion', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/iniciar_sesion`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -24,7 +24,7 @@ export default class AuthService {
 
     async obtenerUsuarios() {
         const token = localStorage.getItem('token')
-        const res = await fetch('https://staydesk-apis.duckdns.org/listar_usuarios', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/listar_usuarios`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

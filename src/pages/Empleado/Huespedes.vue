@@ -195,7 +195,7 @@
 import { ref, computed, onMounted } from 'vue'
 import ModalFormulario from '@/components/ModalFormulario.vue'
 
-const BASE = 'https://staydesk-apis.duckdns.org'
+const BASE = import.meta.env.VITE_API_URL
 const getToken = () => localStorage.getItem('token') || sessionStorage.getItem('token')
 const apiFetch = (url, options = {}) => {
   const token = getToken()

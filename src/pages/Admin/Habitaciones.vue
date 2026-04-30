@@ -153,7 +153,7 @@ import ModalFormulario from '@/components/ModalFormulario.vue'
 
 const emit = defineEmits(['habitacion-actualizada'])
 
-const BASE = 'https://staydesk-apis.duckdns.org'
+const BASE = import.meta.env.VITE_API_URL
 
 const habitaciones = ref([])
 const pisos = ref([])

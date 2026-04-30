@@ -160,7 +160,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import ModalFormulario from '@/components/ModalFormulario.vue'
 import Paginacion from '@/components/Paginacion.vue'
 
-const API = 'https://staydesk-apis.duckdns.org'
+const API_URL = import.meta.env.VITE_API_URL
 
 
 const usuarios = ref([])
@@ -246,7 +246,7 @@ const cargarUsuarios = async () => {
   cargando.value = true
 
   try {
-    const res = await fetch(`${API}/listar_usuarios`, {
+    const res = await fetch(`${API_URL}/listar_usuarios`, {
       headers: authHeaders()
     })
 
@@ -321,7 +321,7 @@ const guardar = async (datos) => {
     let res
 
     if (editando.value) {
-      res = await fetch(`${API}/actualizar_usuario/${form.value.id}`, {
+      res = await fetch(`${API_URL}/actualizar_usuario/${form.value.id}`, {
         method: 'PUT',
         headers: authHeaders(),
         body: JSON.stringify({
@@ -332,7 +332,7 @@ const guardar = async (datos) => {
         })
       })
     } else {
-      res = await fetch(`${API}/crear_usuario`, {
+      res = await fetch(`${API_URL}/crear_usuario`, {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify(datos)
@@ -356,7 +356,7 @@ const eliminar = async () => {
 
   try {
     const res = await fetch(
-      `${API}/eliminar_usuario/${usuarioAEliminar.value.id_usuario}`,
+      `${API_URL}/eliminar_usuario/${usuarioAEliminar.value.id_usuario}`,
       {
         method: 'DELETE',
         headers: authHeaders()
@@ -396,7 +396,7 @@ const reactivar = async () => {
   reactivando.value = usuarioAReactivar.value.id_usuario
 
   try {
-    const url = `${API}/reactivar_usuario/${usuarioAReactivar.value.id_usuario}`
+    const url = `${API_URL}/reactivar_usuario/${usuarioAReactivar.value.id_usuario}`
 
     console.log('Reactivando usuario:', url)
 
