@@ -242,7 +242,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import Paginacion from '@/components/Paginacion.vue'
 
-const BASE_URL = 'https://staydesk-apis.duckdns.org'
+const API_URL = import.meta.env.VITE_API_URL
 const POR_PAGINA = 15
 
 
@@ -268,8 +268,8 @@ const cargar = async () => {
   cargando.value = true
   try {
     const [resFacturas, resReservas] = await Promise.all([
-      fetch(`${BASE_URL}/listar_facturas`, { headers: { accept: 'application/json', ...authHeaders() } }),
-      fetch(`${BASE_URL}/listar_reservas`, { headers: { accept: 'application/json', ...authHeaders() } })
+      fetch(`${API_URL}/listar_facturas`, { headers: { accept: 'application/json', ...authHeaders() } }),
+      fetch(`${API_URL}/listar_reservas`, { headers: { accept: 'application/json', ...authHeaders() } })
     ])
     if (!resFacturas.ok) throw new Error('Error en la API: ' + resFacturas.status)
     const [dataFacturas, dataReservas] = await Promise.all([
@@ -305,7 +305,7 @@ function authHeaders() {
 const pagar = async (factura) => {
   pagando.value = factura.id_factura
   try {
-    const res = await fetch(`${BASE_URL}/pagar_factura/${factura.id_factura}`, {
+    const res = await fetch(`${API_URL}/pagar_factura/${factura.id_factura}`, {
       method: 'PATCH',
       headers: { accept: 'application/json', ...authHeaders() }
     })
@@ -337,7 +337,7 @@ const verDetalle = async (f) => {
 
   if (f.id_reserva) {
     try {
-      const res = await fetch(`${BASE_URL}/factura_por_reserva/${f.id_reserva}`, {
+      const res = await fetch(`${API_URL}/factura_por_reserva/${f.id_reserva}`, {
         headers: { accept: 'application/json', ...authHeaders() }
       })
       if (res.ok) {

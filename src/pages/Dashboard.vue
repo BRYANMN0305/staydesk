@@ -378,7 +378,7 @@ const pisos = ref([])
 
 const cargarPisos = async () => {
   try {
-    const res = await apiFetch('https://staydesk-apis.duckdns.org/listar_pisos')
+    const res = await apiFetch(`${import.meta.env.VITE_API_URL}/listar_pisos')
     if (res.ok) pisos.value = await res.json()
   } catch { }
 }
@@ -459,7 +459,7 @@ const mapEstadoAPI = (estado) => {
 const cargarHabitaciones = async () => {
   cargandoHabitaciones.value = true
   try {
-    const res = await apiFetch('https://staydesk-apis.duckdns.org/listar_todas_habitaciones')
+    const res = await apiFetch(`${import.meta.env.VITE_API_URL}/listar_todas_habitaciones')
     const data = await res.json()
     if (!res.ok) return
     const lista = data.habitaciones || data
@@ -487,7 +487,7 @@ const cargarHabitaciones = async () => {
 
 const cargarEstadisticas = async () => {
   try {
-    const res = await apiFetch('https://staydesk-apis.duckdns.org/estadisticas')
+    const res = await apiFetch(`${import.meta.env.VITE_API_URL}/estadisticas')
     if (!res.ok) return
     const data = await res.json()
     estadisticas.value = {
@@ -506,7 +506,7 @@ const billing = ref([])
 const cargarFacturas = async () => {
   cargandoFacturas.value = true
   try {
-    const res = await apiFetch('https://staydesk-apis.duckdns.org/listar_facturas')
+    const res = await apiFetch(`${import.meta.env.VITE_API_URL}/listar_facturas')
     if (!res.ok) throw new Error('Error API facturas: ' + res.status)
     const data = await res.json()
     billing.value = data.sort((a, b) => b.id_factura - a.id_factura).map(f => ({

@@ -245,7 +245,7 @@ import { Chart, registerables } from 'chart.js'
 
 Chart.register(...registerables)
 
-const BASE = 'https://staydesk-apis.duckdns.org'
+const BASE = import.meta.env.VITE_API_URL
 
 const cargando = ref(false)
 const guardando = ref(false)
