@@ -246,7 +246,7 @@ const cargarUsuarios = async () => {
   cargando.value = true
 
   try {
-    const res = await fetch(`${API_URL}/listar_usuarios`, {
+    const res = await fetch(`${API_URL}/usuarios`, {
       headers: authHeaders()
     })
 
@@ -321,7 +321,7 @@ const guardar = async (datos) => {
     let res
 
     if (editando.value) {
-      res = await fetch(`${API_URL}/actualizar_usuario/${form.value.id}`, {
+      res = await fetch(`${API_URL}/usuarios/${form.value.id}`, {
         method: 'PUT',
         headers: authHeaders(),
         body: JSON.stringify({
@@ -356,7 +356,7 @@ const eliminar = async () => {
 
   try {
     const res = await fetch(
-      `${API_URL}/eliminar_usuario/${usuarioAEliminar.value.id_usuario}`,
+      `${API_URL}/usuarios/${usuarioAEliminar.value.id_usuario}`,
       {
         method: 'DELETE',
         headers: authHeaders()
@@ -396,7 +396,7 @@ const reactivar = async () => {
   reactivando.value = usuarioAReactivar.value.id_usuario
 
   try {
-    const url = `${API_URL}/reactivar_usuario/${usuarioAReactivar.value.id_usuario}`
+    const url = `${API_URL}/usuarios/${usuarioAReactivar.value.id_usuario}`
 
     console.log('Reactivando usuario:', url)
 

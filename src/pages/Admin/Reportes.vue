@@ -307,7 +307,7 @@ async function generarReporte() {
   error.value = null
   datos.value = null
   try {
-    const res = await fetch(`${BASE}/generar_reporte`, {
+    const res = await fetch(`${BASE}/reportes`, {
       method: 'POST',
       headers: authHeaders(),
       body: JSON.stringify({
@@ -332,7 +332,7 @@ async function generarReporte() {
 async function guardarReporte() {
   guardando.value = true
   try {
-    const res = await fetch(`${BASE}/guardar_reporte`, {
+    const res = await fetch(`${BASE}/reportes/guardar`, {
       method: 'POST',
       headers: authHeaders(),
       body: JSON.stringify({
@@ -355,7 +355,7 @@ async function guardarReporte() {
 async function listarReportes() {
   cargandoReportes.value = true
   try {
-    const res = await fetch(`${BASE}/listar_reportes`, { headers: authHeaders() })
+    const res = await fetch(`${BASE}/reportes`, { headers: authHeaders() })
     if (!res.ok) throw new Error()
     const raw = await res.json()
     const arr = typeof raw === 'string' ? JSON.parse(raw) : raw

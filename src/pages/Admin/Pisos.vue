@@ -206,8 +206,8 @@ async function cargarPisos() {
 
   try {
     const [resPisos, resHabs] = await Promise.all([
-      apiFetch(`${BASE}/listar_pisos`),
-      apiFetch(`${BASE}/listar_todas_habitaciones`)
+      apiFetch(`${BASE}/pisos`),
+      apiFetch(`${BASE}/habitaciones`)
     ])
 
     pisos.value = await resPisos.json()
@@ -287,7 +287,7 @@ const eliminarPiso = async () => {
 
   try {
     const res = await apiFetch(
-      `${BASE}/eliminar_piso/${pisoAEliminar.value.id_piso}`,
+      `${BASE}/pisos/${pisoAEliminar.value.id_piso}`,
       { method: 'DELETE' }
     )
 
@@ -329,7 +329,7 @@ async function toggleHabitaciones(idPiso) {
   cargandoHabitaciones.value = idPiso
 
   try {
-    const res = await apiFetch(`${BASE}/listar_todas_habitaciones`)
+    const res = await apiFetch(`${BASE}/pisos`)
     const todas = await res.json()
 
     habitacionesPorPiso.value = {
