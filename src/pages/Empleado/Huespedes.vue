@@ -259,7 +259,7 @@ const camposHuesped = computed(() => [
 const cargar = async () => {
   cargando.value = true
   try {
-    const res = await apiFetch(`${BASE}/listar_huespedes`)
+    const res = await apiFetch(`${BASE}/huespedes`)
     const data = await res.json()
     lista.value = Array.isArray(data) ? data : data.huespedes || []
   } catch (e) {
@@ -276,7 +276,7 @@ const buscarPorDocumento = () => {
   busquedaTimer = setTimeout(async () => {
     cargando.value = true
     try {
-      const res = await apiFetch(`${BASE}/listar_huesped/documento/${busqueda.value.trim()}`)
+      const res = await apiFetch(`${BASE}/huespedes/${busqueda.value.trim()}`)
       const data = await res.json()
       lista.value = Array.isArray(data) ? data : data ? [data] : []
     } catch {
@@ -329,12 +329,12 @@ const guardar = async (datos) => {
   try {
     let res
     if (modoEdicion.value) {
-      res = await apiFetch(`${BASE}/actualizar_huesped/${form.value.id}`, {
+      res = await apiFetch(`${BASE}/huespedes/${form.value.id}`, {
         method: 'PUT',
         body: JSON.stringify({ nombre: datos.nombre, apellido: datos.apellido, telefono: datos.telefono, email: datos.email })
       })
     } else {
-      res = await apiFetch(`${BASE}/crear_huesped`, {
+      res = await apiFetch(`${BASE}/huespedes`, {
         method: 'POST',
         body: JSON.stringify({ nombre: datos.nombre, apellido: datos.apellido, documento: datos.documento, telefono: datos.telefono, email: datos.email })
       })
@@ -357,7 +357,7 @@ const confirmarEliminar = (h) => {
 const eliminar = async () => {
   guardando.value = true
   try {
-    await apiFetch(`${BASE}/eliminar_huesped/${huespedAEliminar.value.id_huesped}`, { method: 'DELETE' })
+    await apiFetch(`${BASE}/huespedes/${huespedAEliminar.value.id_huesped}`, { method: 'DELETE' })
     modalEliminar.value = false
     huespedAEliminar.value = null
     await cargar()
@@ -377,7 +377,7 @@ const reactivar = async () => {
   if (!huespedAReactivar.value?.id_huesped) return
   reactivando.value = huespedAReactivar.value.id_huesped
   try {
-    const res = await apiFetch(`${BASE}/reactivar_huesped/${huespedAReactivar.value.id_huesped}`, {
+    const res = await apiFetch(`${BASE}/huespedes/${huespedAReactivar.value.id_huesped}/reactivar`, {
       method: 'PATCH'
     })
     if (!res.ok) {

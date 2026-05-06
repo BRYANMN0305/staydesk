@@ -268,8 +268,8 @@ const cargar = async () => {
   cargando.value = true
   try {
     const [resFacturas, resReservas] = await Promise.all([
-      fetch(`${API_URL}/listar_facturas`, { headers: { accept: 'application/json', ...authHeaders() } }),
-      fetch(`${API_URL}/listar_reservas`, { headers: { accept: 'application/json', ...authHeaders() } })
+      fetch(`${API_URL}/factura`, { headers: { accept: 'application/json', ...authHeaders() } }),
+      fetch(`${API_URL}/reservas`, { headers: { accept: 'application/json', ...authHeaders() } })
     ])
     if (!resFacturas.ok) throw new Error('Error en la API: ' + resFacturas.status)
     const [dataFacturas, dataReservas] = await Promise.all([
@@ -305,7 +305,7 @@ function authHeaders() {
 const pagar = async (factura) => {
   pagando.value = factura.id_factura
   try {
-    const res = await fetch(`${API_URL}/pagar_factura/${factura.id_factura}`, {
+    const res = await fetch(`${API_URL}/factura/${factura.id_factura}/pagar`, {
       method: 'PATCH',
       headers: { accept: 'application/json', ...authHeaders() }
     })
@@ -337,7 +337,7 @@ const verDetalle = async (f) => {
 
   if (f.id_reserva) {
     try {
-      const res = await fetch(`${API_URL}/factura_por_reserva/${f.id_reserva}`, {
+      const res = await fetch(`${API_URL}/factura/${f.id_reserva}/reserva`, {
         headers: { accept: 'application/json', ...authHeaders() }
       })
       if (res.ok) {

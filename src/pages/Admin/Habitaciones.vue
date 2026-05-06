@@ -246,7 +246,7 @@ async function cargar() {
   cargando.value = true
   errorGeneral.value = ''
   try {
-    const res = await fetch(`${BASE}/listar_todas_habitaciones`, { headers: authHeaders() })
+    const res = await fetch(`${BASE}/habitaciones`, { headers: authHeaders() })
     const data = await res.json()
     habitaciones.value = Array.isArray(data) ? data : data.habitaciones || []
   } catch {
@@ -259,7 +259,7 @@ async function cargar() {
 async function cargarPisos() {
   cargandoPisos.value = true
   try {
-    const res = await fetch(`${BASE}/listar_pisos`, { headers: authHeaders() })
+    const res = await fetch(`${BASE}/pisos`, { headers: authHeaders() })
     pisos.value = await res.json()
   } catch {
     pisos.value = []
@@ -294,7 +294,7 @@ const guardar = async (datos) => {
   guardando.value = true
   errorModal.value = ''
   try {
-    const res = await fetch(`${BASE}/crear_habitacion`, {
+    const res = await fetch(`${BASE}/habitaciones`, {
       method: 'POST',
       headers: authHeaders(),
       body: JSON.stringify({
@@ -334,7 +334,7 @@ const eliminar = async () => {
   errorModal.value = ''
   try {
     const res = await fetch(
-      `${BASE}/eliminar_habitacion/${habitacionAEliminar.value.id_habitacion}`,
+      `${BASE}/habitaciones/${habitacionAEliminar.value.id_habitacion}`,
       { method: 'DELETE', headers: authHeaders() }
     )
     if (!res.ok) throw new Error()
@@ -366,7 +366,7 @@ const guardarPrecioHabitacion = async (habitacion) => {
   guardandoPrecioHab.value = habitacion.id_habitacion
   try {
     const res = await fetch(
-      `${BASE}/actualizar_precio/${habitacion.id_habitacion}`,
+      `${BASE}/habitaciones/${habitacion.id_habitacion}/precio`,
       {
         method: 'PATCH',
         headers: authHeaders(),
@@ -389,7 +389,7 @@ async function reactivarHabitacion(habitacion) {
   actualizando.value = habitacion.id_habitacion
   try {
     const res = await fetch(
-      `${BASE}/reactivar_habitacion/${habitacion.id_habitacion}`,
+      `${BASE}/habitaciones/${habitacion.id_habitacion}/reactivar`,
       { method: 'PATCH', headers: authHeaders() }
     )
     if (!res.ok) throw new Error()
@@ -408,7 +408,7 @@ async function cambiarEstado(habitacion, nuevoEstado) {
   actualizando.value = habitacion.id_habitacion
   try {
     const res = await fetch(
-      `${BASE}/cambiar_estado/${habitacion.id_habitacion}`,
+      `${BASE}/habitaciones/${habitacion.id_habitacion}/estado`,
       {
         method: 'POST',
         headers: authHeaders(),

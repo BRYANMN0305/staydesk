@@ -464,7 +464,7 @@ async function confirmarServicios(reserva) {
   estado._guardando = true
   try {
     for (const srv of estado._serviciosAsignados) {
-      const res = await fetch(`${API_URL}/asignar_servicio/${reserva.id_reserva}`, {
+      const res = await fetch(`${API_URL}/reserva/${reserva.id_reserva}/servicios`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify({ id_servicio: srv.id_servicio, cantidad: srv.cantidad }),
@@ -558,7 +558,7 @@ function validar() {
 async function listarServicios() {
   cargando.value = true
   try {
-    const res = await fetch(`${API_URL}/listar_servicios`, { headers: authHeaders() })
+    const res = await fetch(`${API_URL}/servicios`, { headers: authHeaders() })
     const data = await res.json()
     servicios.value = Array.isArray(data) ? data : []
   } catch {
@@ -576,7 +576,7 @@ async function crearServicio() {
       nombre: nuevoServicio.nombre.trim(),
       precio_unidad: nuevoServicio.precio_unidad,
     }
-    const res = await fetch(`${API_URL}/crear_servicio`, {
+    const res = await fetch(`${API_URL}/servicios`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify(payload),
@@ -605,7 +605,7 @@ async function eliminarServicio() {
   eliminando.value = true
   try {
     const res = await fetch(
-      `${API_URL}/eliminar_servicio/${servicioAEliminar.value.id_servicio}`,
+      `${API_URL}/servicios/${servicioAEliminar.value.id_servicio}`,
       { method: 'DELETE', headers: { ...authHeaders() } }
     )
 

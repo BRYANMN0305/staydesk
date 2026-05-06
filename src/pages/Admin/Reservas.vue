@@ -203,7 +203,7 @@
             <input class="input-custom flex-grow-1" type="text" placeholder="Número de documento..."
               v-model="busquedaDoc" @keyup.enter="buscarHuesped" />
             <button class="btn-buscar" @click="buscarHuesped" :disabled="buscando">{{ buscando ? '...' : 'Buscar'
-            }}</button>
+              }}</button>
           </div>
 
           <div v-if="mensajeBusqueda" class="mb-3 rounded-3 px-3 py-2" :style="huespedEncontrado
@@ -410,14 +410,14 @@ const esperar = (ms) => new Promise(r => setTimeout(r, ms))
 const cargarReservas = async () => {
   cargando.value = true
   try {
-    const res = await fetch(`${API_URL}/listar_reservas`, { headers: authHeaders() })
+    const res = await fetch(`${API_URL}/reservas`, { headers: authHeaders() })
     let reservasData = await res.json()
     await Promise.all(
       reservasData
         .filter(r => r.id_huesped)
         .map(async r => {
           try {
-            const resH = await fetch(`${API_URL}/listar_huesped/id/${r.id_huesped}`, { headers: authHeaders() })
+            const resH = await fetch(`${API_URL}/huespedes/${r.id_huesped}`, { headers: authHeaders() })
             if (resH.ok) {
               const hd = await resH.json()
               r.huesped = { ...r.huesped, ...(Array.isArray(hd) ? hd[0] : hd) }
@@ -432,7 +432,7 @@ const cargarReservas = async () => {
 
 const cargarHabitaciones = async () => {
   try {
-    const res = await fetch(`${API_URL}/listar_todas_habitaciones`, { headers: authHeaders() })
+    const res = await fetch(`${API_URL}/habitaciones`, { headers: authHeaders() })
     let data = await res.json()
     const lista = Array.isArray(data) ? data : data.habitaciones || []
     habitaciones.value = lista.sort((a, b) => Number(a.numero) - Number(b.numero))
@@ -454,7 +454,7 @@ const buscarHuesped = async () => {
   if (!busquedaDoc.value.trim()) return
   buscando.value = true; mensajeBusqueda.value = ''; huespedEncontrado.value = false; idHuespedActual.value = null
   try {
-    const res = await fetch(`${API_URL}/listar_huesped/documento/${busquedaDoc.value.trim()}`, { headers: authHeaders() })
+    const res = await fetch(`${API_URL}/huespedes/${busquedaDoc.value.trim()}`, { headers: authHeaders() })
     if (res.ok) {
       const data = await res.json()
       const h = Array.isArray(data) ? data[0] : data
@@ -481,13 +481,13 @@ const crearReserva = async () => {
   try {
     let idHuesped = idHuespedActual.value
     if (huespedEncontrado.value) {
-      await fetch(`${API_URL}/actualizar_huesped/${idHuesped}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify({ nombre, apellido, telefono, email }) })
+      await fetch(`${API_URL}/huespedes/${idHuesped}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify({ nombre, apellido, telefono, email }) })
     } else {
-      const resH = await fetch(`${API_URL}/crear_huesped`, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ nombre, apellido, documento, telefono, email }) })
+      const resH = await fetch(`${API_URL}/huespedes`, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ nombre, apellido, documento, telefono, email }) })
       if (!resH.ok) { const err = await resH.json().catch(() => ({})); errorModal.value = err?.detail || 'Error al registrar el huésped.'; return }
       const nuevoHuesped = await resH.json(); idHuesped = nuevoHuesped.id_huesped
     }
-    const resR = await fetch(`${API_URL}/crear_reserva`, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ id_habitacion: Number(id_habitacion), id_huesped: idHuesped, fecha_entrada: fecha_entrada + 'T00:00:00', fecha_salida: fecha_salida + 'T00:00:00' }) })
+    const resR = await fetch(`${API_URL}/reservas`, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ id_habitacion: Number(id_habitacion), id_huesped: idHuesped, fecha_entrada: fecha_entrada + 'T00:00:00', fecha_salida: fecha_salida + 'T00:00:00' }) })
     if (!resR.ok) {
       const err = await resR.json().catch(() => ({}))
       errorModal.value = Array.isArray(err?.detail) ? err.detail.map(e => e.msg).join(' | ') : (err?.detail || 'Error al crear la reserva.')
@@ -501,7 +501,7 @@ const crearReserva = async () => {
 const confirmar = async (id) => {
   procesando.value = id
   try {
-    const res = await fetch(`${API_URL}/confirmar_reserva/${id}`, { method: 'PATCH', headers: authHeaders() })
+    const res = await fetch(`${API_URL}/reservas/${id}/confirmar`, { method: 'PATCH', headers: authHeaders() })
     if (!res.ok) { const err = await res.json().catch(() => ({})); alert('Error: ' + (err?.detail || res.status)); return }
     await esperar(600); await cargarReservas(); await cargarHabitaciones(); emit('reserva-actualizada')
   } finally { procesando.value = null }
@@ -512,7 +512,7 @@ const prepararCancelar = (r) => { reservaACancelar.value = r; modalCancelar.valu
 const cancelar = async () => {
   procesando.value = reservaACancelar.value.id_reserva
   try {
-    await fetch(`${API_URL}/cancelar_reserva/${reservaACancelar.value.id_reserva}`, { method: 'PATCH', headers: authHeaders() })
+    await fetch(`${API_URL}/reservas/${reservaACancelar.value.id_reserva}/cancelar`, { method: 'PATCH', headers: authHeaders() })
     modalCancelar.value = false; await esperar(600); await cargarReservas(); await cargarHabitaciones(); emit('reserva-actualizada')
   } finally { procesando.value = null }
 }
@@ -534,7 +534,7 @@ const checkin = async (reserva) => {
 
   procesando.value = reserva.id_reserva
   try {
-    const resCheckin = await fetch(`${API_URL}/checkin_reserva/${reserva.id_reserva}`, { method: 'PATCH', headers: authHeaders() })
+    const resCheckin = await fetch(`${API_URL}/reservas/${reserva.id_reserva}/checkin`, { method: 'PATCH', headers: authHeaders() })
     if (!resCheckin.ok) {
       const err = await resCheckin.json().catch(() => ({}))
       const msg = err?.detail || ''
@@ -560,7 +560,7 @@ const checkin = async (reserva) => {
 const checkout = async (id) => {
   procesando.value = id
   try {
-    await fetch(`${API_URL}/checkout_reserva/${id}`, { method: 'PATCH', headers: authHeaders() })
+    await fetch(`${API_URL}/reservas/${id}/checkout`, { method: 'PATCH', headers: authHeaders() })
     const idx = reservas.value.findIndex(r => r.id_reserva === id)
     if (idx !== -1) {
       reservas.value[idx] = { ...reservas.value[idx], estado: 'FINALIZADA', fecha_salida_real: new Date().toISOString() }

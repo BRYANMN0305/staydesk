@@ -24,7 +24,7 @@ export default class AuthService {
 
     async obtenerUsuarios() {
         const token = localStorage.getItem('token')
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/listar_usuarios`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/usuarios`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
