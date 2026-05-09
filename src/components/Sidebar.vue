@@ -2,7 +2,7 @@
     <aside class="sidebar d-flex flex-column h-100" :class="{ 'sidebar-open': modelValue }">
 
         <!-- HEADER -->
-        <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-4">
+        <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
             <AppLogo />
             <button class="d-md-none btn-close-sidebar border-0 bg-transparent p-1"
                 @click="$emit('update:modelValue', false)">
@@ -13,15 +13,16 @@
         </div>
 
         <!-- NAV -->
-        <nav class="flex-grow-1 px-3 py-2 overflow-auto">
+        <nav class="flex-grow-1 px-3 py-1 overflow-auto">
 
-            <!-- MENU DINÁMICO -->
-            <div class="mb-4">
-                <span class="nav-label d-block mb-2">Principal</span>
+            <!-- MENU DINÁMICO POR SECCIONES -->
+            <div v-for="section in menuSections" :key="section.label" class="mb-2">
+                <span class="nav-label d-block mb-1">{{ section.label }}</span>
 
-                <a v-for="item in menu" :key="item.key" href="#"
+                <a v-for="item in section.items" :key="item.key" href="#"
                     class="nav-item d-flex align-items-center gap-2 rounded-3 px-3 py-2 mb-1 text-decoration-none"
-                    :class="{ active: activeTab === item.key }" @click.prevent="$emit('update:activeTab', item.key)">
+                    :class="{ active: activeTab === item.key }"
+                    @click.prevent="$emit('update:activeTab', item.key)">
 
                     <!-- ICONOS -->
                     <svg v-if="item.key === 'dashboard'" width="17" height="17" viewBox="0 0 24 24" fill="none"
@@ -40,13 +41,13 @@
                         <path d="M19 17v1l1 1" />
                     </svg>
 
-
                     <svg v-else-if="item.key === 'habitaciones'" width="17" height="17" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="1.8">
                         <path d="M2 20v-6h20v6" />
                         <path d="M2 14v-4a2 2 0 012-2h16a2 2 0 012 2v4" />
                         <path d="M7 8V6a1 1 0 011-1h3a1 1 0 011 1v2M13 8V6a1 1 0 011-1h3a1 1 0 011 1v2" />
                     </svg>
+
                     <svg v-else-if="item.key === 'huespedes'" width="17" height="17" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="1.8">
                         <circle cx="10" cy="7" r="4" />
@@ -63,10 +64,7 @@
 
                     <svg v-else-if="item.key === 'servicios'" width="17" height="17" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="1.8">
-                        <!-- Campana -->
-                        <!-- Estrella / calidad de servicio -->
-                        <path
-                            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
 
                     <svg v-else-if="item.key === 'reservas'" width="17" height="17" viewBox="0 0 24 24" fill="none"
@@ -77,7 +75,6 @@
 
                     <svg v-else-if="item.key === 'facturacion' || item.key === 'facturas'" width="17" height="17"
                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                        <!-- Documento con líneas de contenido -->
                         <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
                         <path d="M14 2v6h6" />
                         <path d="M8 13h8M8 17h5" />
@@ -88,6 +85,32 @@
                         <path d="M18 20V10" />
                         <path d="M12 20V4" />
                         <path d="M6 20v-6" />
+                    </svg>
+
+                    <svg v-else-if="item.key === 'housekeeping'" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.8">
+                        <path d="M6 7h12l-1.5 11a2 2 0 01-2 1.8H9.5a2 2 0 01-2-1.8L6 7z" stroke-linejoin="round" />
+                        <path d="M4 7h16" stroke-linecap="round" />
+                        <path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2" stroke-linejoin="round" />
+                        <path d="M10 12h4M9 15.5h6" stroke-linecap="round" opacity="0.7" />
+                    </svg>
+
+                    <svg v-else-if="item.key === 'mantenimiento'" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.8">
+                        <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3-3a6 6 0 01-7.4 7.4l-6.3 6.3a2.12 2.12 0 01-3-3l6.3-6.3a6 6 0 017.4-7.4l-3 3z"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+
+                    <svg v-else-if="item.key === 'configuracion'" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="1.8">
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+                    </svg>
+
+                    <svg v-else-if="item.key === 'roles'" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.8">
+                        <rect x="3" y="11" width="18" height="11" rx="2" />
+                        <path d="M7 11V7a5 5 0 0110 0v4" />
                     </svg>
 
                     <!-- DEFAULT -->
@@ -128,6 +151,7 @@
 
 <script setup>
 import AppLogo from '@/components/AppLogo.vue'
+import { usePermissions } from '../../composables/usePermissions'
 
 defineProps({
     modelValue: Boolean,
@@ -136,33 +160,39 @@ defineProps({
 
 defineEmits(['update:modelValue', 'update:activeTab', 'logout'])
 
-const rol = localStorage.getItem('rol')
-const nombre = localStorage.getItem('nombre') || localStorage.getItem('name') || ''
+const { filterSidebarItems } = usePermissions()
+
+const nombre = localStorage.getItem('nombre') || ''
+const rol = localStorage.getItem('rol') || ''
 const iniciales = nombre
     ? nombre.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
-    : (rol === 'admin' ? 'AD' : 'EM')
+    : '??'
 
-const menuAdmin = [
-    { key: 'dashboard', label: 'Dashboard' },
-    { key: 'usuarios', label: 'Usuarios' },
-    { key: 'pisos', label: 'Pisos' },
-    { key: 'habitaciones', label: 'Habitaciones' },
-    { key: 'huespedes', label: 'Huéspedes' },
-    { key: 'servicios', label: 'Servicios' },
-    { key: 'reservas', label: 'Reservas' },
-    { key: 'facturas', label: 'Facturas' },
-    { key: 'reportes', label: 'Reportes' }
+// Lista completa con sección asignada — filterSidebarItems filtra según permisos VER del JWT
+const todosLosItems = [
+    { tab: 'dashboard',     label: 'Dashboard',     section: 'Principal' },
+    { tab: 'reservas',      label: 'Reservas',       section: 'Principal' },
+    { tab: 'habitaciones',  label: 'Habitaciones',   section: 'Principal' },
+    { tab: 'pisos',         label: 'Pisos',          section: 'Principal' },
+    { tab: 'huespedes',     label: 'Huéspedes',      section: 'Operaciones' },
+    { tab: 'housekeeping',  label: 'Housekeeping',   section: 'Operaciones' },
+    { tab: 'mantenimiento', label: 'Mantenimiento',  section: 'Operaciones' },
+    { tab: 'servicios',     label: 'Servicios',      section: 'Operaciones' },
+    { tab: 'facturas',      label: 'Facturas',       section: 'Operaciones' },
+    { tab: 'usuarios',      label: 'Usuarios',       section: 'Sistema' },
+    { tab: 'roles',         label: 'Roles',          section: 'Sistema' },
+    { tab: 'reportes',      label: 'Reportes',       section: 'Sistema' },
+    { tab: 'configuracion', label: 'Configuración',  section: 'Sistema' },
 ]
 
-const menuEmpleado = [
-    { key: 'dashboard', label: 'Dashboard' },
-    { key: 'habitaciones', label: 'Habitaciones' },
-    { key: 'huespedes', label: 'Huéspedes' },
-    { key: 'reservas', label: 'Reservas' },
-    { key: 'facturas', label: 'Facturas' }
-]
+// filterSidebarItems sigue filtrando por permisos del JWT — solo agregamos agrupación
+const filtered = filterSidebarItems(todosLosItems)
+    .map(i => ({ key: i.tab, label: i.label, section: i.section }))
 
-const menu = rol === 'admin' ? menuAdmin : menuEmpleado
+const sectionOrder = ['Principal', 'Operaciones', 'Sistema']
+const menuSections = sectionOrder
+    .map(label => ({ label, items: filtered.filter(i => i.section === label) }))
+    .filter(s => s.items.length > 0) // sección no visible si el rol no tiene ningún item en ella
 </script>
 
 <style scoped>
@@ -192,10 +222,11 @@ const menu = rol === 'admin' ? menuAdmin : menuEmpleado
 }
 
 .nav-item {
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 500;
     color: rgba(248, 240, 251, 0.55);
     transition: all .2s;
+    line-height: 1.3;
 }
 
 .nav-item:hover {

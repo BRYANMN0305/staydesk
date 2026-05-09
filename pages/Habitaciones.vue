@@ -148,7 +148,7 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
-import Habitacion_Card from '../../components/Habitacion_Card.vue'
+import Habitacion_Card from '@/components/Habitacion_Card.vue'
 import ModalFormulario from '@/components/ModalFormulario.vue'
 
 const emit = defineEmits(['habitacion-actualizada'])
