@@ -51,8 +51,8 @@
             </td>
             <td style="font-size:14px">{{ u.email }}</td>
             <td>
-              <span class="badge-role" :class="u.rol === 'ADMINISTRADOR' ? 'admin' : 'empleado'">
-                {{ u.rol }}
+              <span class="badge-role" :style="estiloRol(nombreDeRol(u.id_rol))">
+                {{ nombreDeRol(u.id_rol) }}
               </span>
             </td>
             <td>
@@ -98,8 +98,8 @@
             </div>
           </div>
           <div class="d-flex flex-column align-items-end gap-1">
-            <span class="badge-role" :class="u.rol === 'ADMINISTRADOR' ? 'admin' : 'empleado'">
-              {{ u.rol === 'ADMINISTRADOR' ? 'Admin' : 'Empleado' }}
+            <span class="badge-role" :style="estiloRol(nombreDeRol(u.id_rol))">
+              {{ nombreDeRol(u.id_rol) }}
             </span>
             <span class="badge-estado-usuario" :class="esInactivo(u) ? 'inactivo' : 'activo'">
               {{ esInactivo(u) ? 'Inactivo' : 'Activo' }}
@@ -162,19 +162,19 @@ import Paginacion from '@/components/Paginacion.vue'
 
 const API_URL = import.meta.env.VITE_API_URL
 
-
 const usuarios = ref([])
+const roles    = ref([])   // ← roles cargados desde la API
 const cargando = ref(false)
 
-const modalAbierto = ref(false)
+const modalAbierto  = ref(false)
 const modalEliminar = ref(false)
 const modalReactivar = ref(false)
 
-const editando = ref(false)
-const guardando = ref(false)
+const editando   = ref(false)
+const guardando  = ref(false)
 const reactivando = ref(null)
 
-const usuarioAEliminar = ref(null)
+const usuarioAEliminar  = ref(null)
 const usuarioAReactivar = ref(null)
 
 const mostrarInactivos = ref(false)
@@ -186,25 +186,48 @@ const form = ref({
   apellido: '',
   email: '',
   contrasena: '',
-  rol: ''
+  id_rol: null,
+  documento: '',
+  telefono: ''
 })
 
-const pagina = ref(1)
+const pagina    = ref(1)
 const POR_PAGINA = 15
 
-
+// ── Auth ────────────────────────────────────────────────────────────────────
 const authHeaders = () => {
   const token = localStorage.getItem('token') || sessionStorage.getItem('token')
-
   return {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {})
   }
 }
 
+// ── Helpers ─────────────────────────────────────────────────────────────────
 const esInactivo = (u) =>
   Number(u.activo) === 0 || u.estado?.toUpperCase() === 'INACTIVO'
 
+// Genera un color consistente por nombre de rol (igual que en Configuración)
+const PALETA_ROLES = ['#6320EE', '#16a34a', '#d97706', '#dc2626', '#0ea5e9', '#8b5cf6', '#ec4899']
+const colorRol = (nombre) =>
+  PALETA_ROLES[(nombre?.charCodeAt(0) ?? 0) % PALETA_ROLES.length]
+
+const estiloRol = (nombre) => {
+  const color = colorRol(nombre)
+  return {
+    background: `${color}18`,
+    color,
+    border: `1px solid ${color}30`
+  }
+}
+
+// Devuelve el nombre del rol dado su id, cruzando con la lista de roles cargada
+const nombreDeRol = (id_rol) => {
+  const rol = roles.value.find(r => r.id_rol === id_rol)
+  return rol?.nombre ?? '—'
+}
+
+// ── Computed ─────────────────────────────────────────────────────────────────
 const usuariosFiltrados = computed(() => {
   const lista = mostrarInactivos.value
     ? usuarios.value
@@ -222,42 +245,46 @@ const cantidadInactivos = computed(() =>
   usuarios.value.filter(u => esInactivo(u)).length
 )
 
-watch(mostrarInactivos, () => { pagina.value = 1 })
+// Opciones del select construidas desde los roles activos de la API
+// value = id_rol (número) que es lo que espera el PUT/POST
+const opcionesRol = computed(() =>
+  roles.value
+    .filter(r => r.activo)
+    .map(r => ({ value: r.id_rol, label: r.nombre }))
+)
 
 const camposUsuario = computed(() => [
-  { key: 'nombre', label: 'Nombre', type: 'text', placeholder: 'Nombre', colClass: 'col-6' },
-  { key: 'apellido', label: 'Apellido', type: 'text', placeholder: 'Apellido', colClass: 'col-6' },
-  { key: 'email', label: 'Email', type: 'email', placeholder: 'Email', colClass: 'col-12' },
-  ...(!editando.value
-    ? [{ key: 'contrasena', label: 'Contraseña', type: 'password', placeholder: 'Contraseña', colClass: 'col-12' }]
-    : []
-  ),
+  { key: 'nombre',   label: 'Nombre',    type: 'text',  placeholder: 'Nombre',    colClass: 'col-6' },
+  { key: 'apellido', label: 'Apellido',  type: 'text',  placeholder: 'Apellido',  colClass: 'col-6' },
+  { key: 'email',    label: 'Email',     type: 'email', placeholder: 'Email',     colClass: 'col-12' },
+  { key: 'documento',label: 'Documento', type: 'text',  placeholder: 'Nº de documento', colClass: 'col-6' },
+  { key: 'telefono', label: 'Teléfono',  type: 'text',  placeholder: 'Teléfono',  colClass: 'col-6' },
   {
-    key: 'rol', label: 'Rol', type: 'select', colClass: 'col-12',
+    key: 'contrasena',
+    label: editando.value ? 'Nueva contraseña (obligatoria para guardar cambios)' : 'Contraseña',
+    type: 'password',
+    placeholder: editando.value ? 'Mínimo 8 caracteres' : 'Contraseña',
+    colClass: 'col-12'
+  },
+  {
+    key: 'id_rol',
+    label: 'Rol',
+    type: 'select',
+    colClass: 'col-12',
     placeholder: 'Selecciona un rol',
-    opciones: [
-      { value: 'ADMINISTRADOR', label: 'Administrador' },
-      { value: 'EMPLEADO', label: 'Empleado' }
-    ]
+    opciones: opcionesRol.value
   }
 ])
 
+watch(mostrarInactivos, () => { pagina.value = 1 })
+
+// ── Cargar datos ─────────────────────────────────────────────────────────────
 const cargarUsuarios = async () => {
   cargando.value = true
-
   try {
-    const res = await fetch(`${API_URL}/usuarios`, {
-      headers: authHeaders()
-    })
-
+    const res  = await fetch(`${API_URL}/usuarios`, { headers: authHeaders() })
     const data = await res.json()
-
-    usuarios.value = Array.isArray(data)
-      ? data
-      : (data.usuarios || [])
-
-    console.log('USUARIOS RAW:', usuarios.value)
-
+    usuarios.value = Array.isArray(data) ? data : (data.usuarios || [])
   } catch (e) {
     console.error('Error cargando usuarios:', e)
   } finally {
@@ -265,40 +292,51 @@ const cargarUsuarios = async () => {
   }
 }
 
-const abrirModalCrear = () => {
-  editando.value = false
-  form.value = {
-    id: null,
-    nombre: '',
-    apellido: '',
-    email: '',
-    contrasena: '',
-    rol: ''
+const cargarRoles = async () => {
+  try {
+    const res = await fetch(`${API_URL}/roles`, { headers: authHeaders() })
+    if (res.ok) roles.value = await res.json()
+  } catch (e) {
+    console.error('Error cargando roles:', e)
   }
-  modalAbierto.value = true
 }
 
-const abrirModalEditar = (u) => {
+// ── Modales ──────────────────────────────────────────────────────────────────
+const abrirModalCrear = async () => {
+  editando.value = false
+  form.value = { id: null, nombre: '', apellido: '', email: '', contrasena: '', id_rol: null, documento: '', telefono: '' }
+  errorModal.value = ''
+  modalAbierto.value = true
+  await cargarRoles()
+}
+
+const abrirModalEditar = async (u) => {
   editando.value = true
+  await cargarRoles()
   form.value = {
-    id: u.id_usuario,
-    nombre: u.nombre,
-    apellido: u.apellido,
-    email: u.email,
+    id:        u.id_usuario,
+    nombre:    u.nombre,
+    apellido:  u.apellido,
+    email:     u.email,
     contrasena: '',
-    rol: u.rol
+    id_rol:    u.id_rol ?? null,
+    documento: u.documento || '',
+    telefono:  u.telefono  || ''
   }
+  errorModal.value   = ''
   modalAbierto.value = true
 }
 
 const cerrarModal = () => {
   modalAbierto.value = false
+  errorModal.value = ''
 }
 
+// ── Guardar ──────────────────────────────────────────────────────────────────
 const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/
 
 const guardar = async (datos) => {
-  guardando.value = true
+  guardando.value  = true
   errorModal.value = ''
 
   if (!datos.nombre || !datos.apellido) {
@@ -321,55 +359,71 @@ const guardar = async (datos) => {
     let res
 
     if (editando.value) {
+      // Validar contrasena antes de enviar (el backend siempre la requiere al editar)
+      if (!datos.contrasena || datos.contrasena.trim().length < 8) {
+        errorModal.value = 'Debes ingresar una contraseña de al menos 8 caracteres para guardar cambios.'
+        guardando.value = false
+        return
+      }
       res = await fetch(`${API_URL}/usuarios/${form.value.id}`, {
         method: 'PUT',
         headers: authHeaders(),
         body: JSON.stringify({
-          nombre: datos.nombre,
-          apellido: datos.apellido,
-          email: datos.email,
-          rol: datos.rol
+          nombre:     datos.nombre,
+          apellido:   datos.apellido,
+          email:      datos.email,
+          id_rol:     Number(datos.id_rol),
+          contrasena: datos.contrasena,
+          documento:  datos.documento || '',
+          telefono:   datos.telefono  || ''
         })
       })
     } else {
-      res = await fetch(`${API_URL}/crear_usuario`, {
+      res = await fetch(`${API_URL}/usuarios`, {
         method: 'POST',
         headers: authHeaders(),
-        body: JSON.stringify(datos)
+        body: JSON.stringify({
+          nombre:     datos.nombre,
+          apellido:   datos.apellido,
+          email:      datos.email,
+          id_rol:     Number(datos.id_rol),
+          contrasena: datos.contrasena,
+          documento:  datos.documento  || '',
+          telefono:   datos.telefono   || ''
+        })
       })
     }
 
-    if (!res.ok) throw new Error()
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      errorModal.value = err?.detail || 'Error al guardar usuario.'
+      return
+    }
 
     cerrarModal()
     await cargarUsuarios()
 
   } catch (e) {
-    errorModal.value = 'Error al guardar usuario'
+    errorModal.value = 'Error de conexión. Intenta de nuevo.'
   } finally {
     guardando.value = false
   }
 }
 
+// ── Eliminar ──────────────────────────────────────────────────────────────────
+const confirmarEliminar = (u) => { usuarioAEliminar.value = u; modalEliminar.value = true }
+
 const eliminar = async () => {
   guardando.value = true
-
   try {
-    const res = await fetch(
-      `${API_URL}/usuarios/${usuarioAEliminar.value.id_usuario}`,
-      {
-        method: 'DELETE',
-        headers: authHeaders()
-      }
-    )
-
+    const res = await fetch(`${API_URL}/usuarios/${usuarioAEliminar.value.id_usuario}`, {
+      method: 'DELETE',
+      headers: authHeaders()
+    })
     if (!res.ok) throw new Error()
-
-    modalEliminar.value = false
+    modalEliminar.value    = false
     usuarioAEliminar.value = null
-
     await cargarUsuarios()
-
   } catch (e) {
     console.error('Error eliminar:', e)
   } finally {
@@ -377,45 +431,26 @@ const eliminar = async () => {
   }
 }
 
-const confirmarEliminar = (u) => {
-  usuarioAEliminar.value = u
-  modalEliminar.value = true
-}
-
-const confirmarReactivar = (u) => {
-  usuarioAReactivar.value = u
-  modalReactivar.value = true
-}
+// ── Reactivar ─────────────────────────────────────────────────────────────────
+const confirmarReactivar = (u) => { usuarioAReactivar.value = u; modalReactivar.value = true }
 
 const reactivar = async () => {
-  if (!usuarioAReactivar.value?.id_usuario) {
-    console.error('No hay usuario seleccionado')
-    return
-  }
+  if (!usuarioAReactivar.value?.id_usuario) return
 
   reactivando.value = usuarioAReactivar.value.id_usuario
 
   try {
-    const url = `${API_URL}/usuarios/${usuarioAReactivar.value.id_usuario}`
-
-    console.log('Reactivando usuario:', url)
-
-    const res = await fetch(url, {
+    const res = await fetch(`${API_URL}/usuarios/${usuarioAReactivar.value.id_usuario}`, {
       method: 'PATCH',
       headers: authHeaders()
     })
 
     const data = await res.json().catch(() => null)
 
-    console.log('Respuesta backend:', res.status, data)
+    if (!res.ok) throw new Error(data?.detail || 'Error al reactivar usuario')
 
-    if (!res.ok) {
-      throw new Error(data?.detail || 'Error al reactivar usuario')
-    }
-
-    modalReactivar.value = false
+    modalReactivar.value    = false
     usuarioAReactivar.value = null
-
     await cargarUsuarios()
 
   } catch (e) {
@@ -426,8 +461,10 @@ const reactivar = async () => {
   }
 }
 
+// ── Init ──────────────────────────────────────────────────────────────────────
 onMounted(() => {
   cargarUsuarios()
+  cargarRoles()
 })
 </script>
 
@@ -538,16 +575,6 @@ onMounted(() => {
   font-weight: 600;
 }
 
-.admin {
-  background: rgba(99, 32, 238, 0.1);
-  color: #6320EE;
-}
-
-.empleado {
-  background: rgba(22, 163, 74, 0.1);
-  color: #16a34a;
-}
-
 .badge-estado-usuario {
   padding: 4px 10px;
   border-radius: 999px;
@@ -589,12 +616,11 @@ onMounted(() => {
 .btn-delete {
   background: rgba(220, 38, 38, 0.08);
   color: #dc2626;
-  border: 1px solid rgba(220, 38, 38, 0.2);
   transition: all .2s;
   font-size: 13px;
   padding: 5px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(99, 32, 238, 0.2);
+  border: 1px solid rgba(220, 38, 38, 0.2);
   font-weight: 450;
 }
 

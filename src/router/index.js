@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Login from '../../pages/Login.vue'
-import Dashboard from '../../pages/Dashboard.vue'
-import NoAutorizado from '../../pages/NoAutorizado.vue'
+import Login from '../pages/Login.vue'
+import Dashboard from '../pages/Dashboard.vue'
+import NoAutorizado from '../pages/NoAutorizado.vue'
 
 function parseJwt(token) {
   try { return JSON.parse(atob(token.split('.')[1])) } catch { return null }
