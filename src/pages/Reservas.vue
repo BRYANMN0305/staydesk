@@ -1,23 +1,46 @@
 <template>
   <div class="position-relative">
     <div class="bg-white rounded-3 border p-4">
-
       <!-- Header -->
-      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <div
+        class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2"
+      >
         <div>
-          <h2 class="fw-bold mb-0" style="font-size:25px">Reservas</h2>
-          <p class="text-muted mb-0" style="font-size:12px">Gestión de reservas</p>
+          <h2 class="fw-bold mb-0" style="font-size: 25px">Reservas</h2>
+          <p class="text-muted mb-0" style="font-size: 12px">
+            Gestión de reservas
+          </p>
         </div>
         <div class="d-flex gap-2">
-          <button class="btn-outline-custom" @click="vistaActual = vistaActual === 'tabla' ? 'calendario' : 'tabla'">
-            <svg v-if="vistaActual === 'tabla'" width="15" height="15" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2">
+          <button
+            class="btn-outline-custom"
+            @click="
+              vistaActual = vistaActual === 'tabla' ? 'calendario' : 'tabla'
+            "
+          >
+            <svg
+              v-if="vistaActual === 'tabla'"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
               <line x1="16" y1="2" x2="16" y2="6" />
               <line x1="8" y1="2" x2="8" y2="6" />
               <line x1="3" y1="10" x2="21" y2="10" />
             </svg>
-            <svg v-else width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              v-else
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <line x1="8" y1="6" x2="21" y2="6" />
               <line x1="8" y1="12" x2="21" y2="12" />
               <line x1="8" y1="18" x2="21" y2="18" />
@@ -25,10 +48,17 @@
               <line x1="3" y1="12" x2="3.01" y2="12" />
               <line x1="3" y1="18" x2="3.01" y2="18" />
             </svg>
-            {{ vistaActual === 'tabla' ? 'Ver calendario' : 'Ver tabla' }}
+            {{ vistaActual === "tabla" ? "Ver calendario" : "Ver tabla" }}
           </button>
           <button class="btn-primary-custom" @click="abrirModal">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
               <path d="M12 5v14M5 12h14" />
             </svg>
             Nueva reserva
@@ -36,14 +66,23 @@
         </div>
       </div>
       <template v-if="vistaActual === 'tabla'">
-        <div v-if="cargando" class="text-muted text-center py-5" style="font-size:13px">Cargando reservas...</div>
+        <div
+          v-if="cargando"
+          class="text-muted text-center py-5"
+          style="font-size: 13px"
+        >
+          Cargando reservas...
+        </div>
 
-        <div v-else-if="reservas.length === 0" class="text-muted fst-italic text-center py-5" style="font-size:13px">
+        <div
+          v-else-if="reservas.length === 0"
+          class="text-muted fst-italic text-center py-5"
+          style="font-size: 13px"
+        >
           No hay reservas registradas.
         </div>
 
         <template v-else>
-
           <!-- TABLA DESKTOP -->
           <div class="d-none d-md-block table-responsive">
             <table class="table align-middle">
@@ -62,40 +101,82 @@
               </thead>
               <tbody>
                 <tr v-for="r in reservasPaginadas" :key="r.id_reserva">
-                  <td style="font-size:14px">Hab. {{ r.habitacion?.numero }}</td>
-                  <td style="font-size:14px">{{ r.huesped?.nombre }} {{ r.huesped?.apellido }}</td>
-                  <td style="font-size:14px">{{ r.huesped?.documento }}</td>
-                  <td style="font-size:14px">{{ r.usuario?.nombre }}</td>
-                  <td style="font-size:14px">{{ formatFecha(r.fecha_entrada) }}</td>
-                  <td style="font-size:14px">{{ formatFecha(r.fecha_salida) }}</td>
-                  <td style="font-size:14px">{{ formatFecha(r.fecha_salida_real) || '—' }}</td>
+                  <td style="font-size: 14px">
+                    Hab. {{ r.habitacion?.numero }}
+                  </td>
+                  <td style="font-size: 14px">
+                    {{ r.huesped?.nombre }} {{ r.huesped?.apellido }}
+                  </td>
+                  <td style="font-size: 14px">{{ r.huesped?.documento }}</td>
+                  <td style="font-size: 14px">{{ r.usuario?.nombre }}</td>
+                  <td style="font-size: 14px">
+                    {{ formatFecha(r.fecha_entrada) }}
+                  </td>
+                  <td style="font-size: 14px">
+                    {{ formatFecha(r.fecha_salida) }}
+                  </td>
+                  <td style="font-size: 14px">
+                    {{ formatFecha(r.fecha_salida_real) || "—" }}
+                  </td>
                   <td>
-                    <span class="badge-estado" :class="claseEstado(estado(r.estado))">
+                    <span
+                      class="badge-estado"
+                      :class="claseEstado(estado(r.estado))"
+                    >
                       {{ estado(r.estado) }}
                     </span>
                   </td>
                   <td>
                     <div class="d-flex gap-2 flex-wrap">
                       <template v-if="estado(r.estado) === 'PENDIENTE'">
-                        <button class="action-btn confirm-btn" :disabled="procesando === r.id_reserva"
-                          @click="confirmar(r.id_reserva)">{{ procesando === r.id_reserva ? '...' : 'Confirmar'
-                          }}</button>
-                        <button class="action-btn cancel-btn" :disabled="procesando === r.id_reserva"
-                          @click="prepararCancelar(r)">{{ procesando === r.id_reserva ? '...' : 'Cancelar' }}</button>
+                        <button
+                          class="action-btn confirm-btn"
+                          :disabled="procesando === r.id_reserva"
+                          @click="confirmar(r.id_reserva)"
+                        >
+                          {{
+                            procesando === r.id_reserva ? "..." : "Confirmar"
+                          }}
+                        </button>
+                        <button
+                          class="action-btn cancel-btn"
+                          :disabled="procesando === r.id_reserva"
+                          @click="prepararCancelar(r)"
+                        >
+                          {{ procesando === r.id_reserva ? "..." : "Cancelar" }}
+                        </button>
                       </template>
                       <template v-else-if="estado(r.estado) === 'CONFIRMADA'">
-                        <button class="action-btn checkin-btn" :disabled="procesando === r.id_reserva"
-                          @click="checkin(r)">{{ procesando === r.id_reserva ? '...' : 'Check-in' }}</button>
-                        <button class="action-btn cancel-btn" :disabled="procesando === r.id_reserva"
-                          @click="prepararCancelar(r)">{{ procesando === r.id_reserva ? '...' : 'Cancelar' }}</button>
+                        <button
+                          class="action-btn checkin-btn"
+                          :disabled="procesando === r.id_reserva"
+                          @click="checkin(r)"
+                        >
+                          {{ procesando === r.id_reserva ? "..." : "Check-in" }}
+                        </button>
+                        <button
+                          class="action-btn cancel-btn"
+                          :disabled="procesando === r.id_reserva"
+                          @click="prepararCancelar(r)"
+                        >
+                          {{ procesando === r.id_reserva ? "..." : "Cancelar" }}
+                        </button>
                       </template>
                       <template v-else-if="estado(r.estado) === 'CHECKIN'">
-                        <button class="action-btn checkout-btn" :disabled="procesando === r.id_reserva"
-                          @click="checkout(r.id_reserva)">{{ procesando === r.id_reserva ? '...' : 'Check-out'
-                          }}</button>
+                        <button
+                          class="action-btn checkout-btn"
+                          :disabled="procesando === r.id_reserva"
+                          @click="checkout(r.id_reserva)"
+                        >
+                          {{
+                            procesando === r.id_reserva ? "..." : "Check-out"
+                          }}
+                        </button>
                       </template>
                       <template v-else>
-                        <span class="text-muted" style="font-size:12px">Sin acciones</span>
+                        <span class="text-muted" style="font-size: 12px"
+                          >Sin acciones</span
+                        >
                       </template>
                     </div>
                   </td>
@@ -106,70 +187,133 @@
 
           <!-- CARDS MOBILE -->
           <div class="d-md-none d-flex flex-column gap-2">
-            <div v-for="r in reservasPaginadas" :key="r.id_reserva" class="rounded-3 border p-3"
-              style="border-color:rgba(99,32,238,0.1)!important">
-
+            <div
+              v-for="r in reservasPaginadas"
+              :key="r.id_reserva"
+              class="rounded-3 border p-3"
+              style="border-color: rgba(99, 32, 238, 0.1) !important"
+            >
               <!-- Top: habitación + estado -->
-              <div class="d-flex align-items-center justify-content-between mb-2">
-                <span class="fw-bold" style="font-size:15px">Hab. {{ r.habitacion?.numero }}</span>
-                <span class="badge-estado" :class="claseEstado(estado(r.estado))">{{ estado(r.estado) }}</span>
+              <div
+                class="d-flex align-items-center justify-content-between mb-2"
+              >
+                <span class="fw-bold" style="font-size: 15px"
+                  >Hab. {{ r.habitacion?.numero }}</span
+                >
+                <span
+                  class="badge-estado"
+                  :class="claseEstado(estado(r.estado))"
+                  >{{ estado(r.estado) }}</span
+                >
               </div>
 
               <!-- Huésped -->
-              <div class="mb-1" style="font-size:13px">
-                <span class="fw-semibold">{{ r.huesped?.nombre }} {{ r.huesped?.apellido }}</span>
+              <div class="mb-1" style="font-size: 13px">
+                <span class="fw-semibold"
+                  >{{ r.huesped?.nombre }} {{ r.huesped?.apellido }}</span
+                >
                 <span class="text-muted ms-2">{{ r.huesped?.documento }}</span>
               </div>
 
               <!-- Fechas -->
-              <div class="d-flex gap-3 mb-2" style="font-size:12px;color:#6b7280">
+              <div
+                class="d-flex gap-3 mb-2"
+                style="font-size: 12px; color: #6b7280"
+              >
                 <span>Entrada: {{ formatFecha(r.fecha_entrada) }}</span>
                 <span>Salida: {{ formatFecha(r.fecha_salida) }}</span>
               </div>
 
               <!-- Salida real si existe -->
-              <div v-if="r.fecha_salida_real" class="mb-2" style="font-size:12px;color:#6b7280">Salida real: {{
-                formatFecha(r.fecha_salida_real) }}
+              <div
+                v-if="r.fecha_salida_real"
+                class="mb-2"
+                style="font-size: 12px; color: #6b7280"
+              >
+                Salida real: {{ formatFecha(r.fecha_salida_real) }}
               </div>
 
               <!-- Acciones -->
               <div class="d-flex gap-2 mt-2">
                 <template v-if="estado(r.estado) === 'PENDIENTE'">
-                  <button class="action-btn confirm-btn flex-grow-1" :disabled="procesando === r.id_reserva"
-                    @click="confirmar(r.id_reserva)">{{ procesando === r.id_reserva ? '...' : 'Confirmar' }}</button>
-                  <button class="action-btn cancel-btn flex-grow-1" :disabled="procesando === r.id_reserva"
-                    @click="prepararCancelar(r)">{{ procesando === r.id_reserva ? '...' : 'Cancelar' }}</button>
+                  <button
+                    class="action-btn confirm-btn flex-grow-1"
+                    :disabled="procesando === r.id_reserva"
+                    @click="confirmar(r.id_reserva)"
+                  >
+                    {{ procesando === r.id_reserva ? "..." : "Confirmar" }}
+                  </button>
+                  <button
+                    class="action-btn cancel-btn flex-grow-1"
+                    :disabled="procesando === r.id_reserva"
+                    @click="prepararCancelar(r)"
+                  >
+                    {{ procesando === r.id_reserva ? "..." : "Cancelar" }}
+                  </button>
                 </template>
                 <template v-else-if="estado(r.estado) === 'CONFIRMADA'">
-                  <button class="action-btn checkin-btn flex-grow-1" :disabled="procesando === r.id_reserva"
-                    @click="checkin(r)">{{ procesando === r.id_reserva ? '...' : 'Check-in' }}</button>
-                  <button class="action-btn cancel-btn flex-grow-1" :disabled="procesando === r.id_reserva"
-                    @click="prepararCancelar(r)">{{ procesando === r.id_reserva ? '...' : 'Cancelar' }}</button>
+                  <button
+                    class="action-btn checkin-btn flex-grow-1"
+                    :disabled="procesando === r.id_reserva"
+                    @click="checkin(r)"
+                  >
+                    {{ procesando === r.id_reserva ? "..." : "Check-in" }}
+                  </button>
+                  <button
+                    class="action-btn cancel-btn flex-grow-1"
+                    :disabled="procesando === r.id_reserva"
+                    @click="prepararCancelar(r)"
+                  >
+                    {{ procesando === r.id_reserva ? "..." : "Cancelar" }}
+                  </button>
                 </template>
                 <template v-else-if="estado(r.estado) === 'CHECKIN'">
-                  <button class="action-btn checkout-btn w-100" :disabled="procesando === r.id_reserva"
-                    @click="checkout(r.id_reserva)">{{ procesando === r.id_reserva ? '...' : 'Check-out' }}</button>
+                  <button
+                    class="action-btn checkout-btn w-100"
+                    :disabled="procesando === r.id_reserva"
+                    @click="checkout(r.id_reserva)"
+                  >
+                    {{ procesando === r.id_reserva ? "..." : "Check-out" }}
+                  </button>
                 </template>
                 <template v-else>
-                  <span class="text-muted" style="font-size:12px">Sin acciones</span>
+                  <span class="text-muted" style="font-size: 12px"
+                    >Sin acciones</span
+                  >
                 </template>
               </div>
             </div>
           </div>
 
           <!-- Paginación -->
-          <div v-if="totalPaginas > 1" class="d-flex align-items-center justify-content-between mt-3 flex-wrap gap-2">
-            <span class="text-muted" style="font-size:12px">
-              Mostrando {{ inicio + 1 }}–{{ Math.min(inicio + POR_PAGINA, reservasOrdenadas.length) }}
+          <div
+            v-if="totalPaginas > 1"
+            class="d-flex align-items-center justify-content-between mt-3 flex-wrap gap-2"
+          >
+            <span class="text-muted" style="font-size: 12px">
+              Mostrando {{ inicio + 1 }}–{{
+                Math.min(inicio + POR_PAGINA, reservasOrdenadas.length)
+              }}
               de {{ reservasOrdenadas.length }} reservas
             </span>
             <div class="d-flex gap-2">
-              <button class="pag-btn" :disabled="pagina === 1" @click="pagina--">← Anterior</button>
+              <button
+                class="pag-btn"
+                :disabled="pagina === 1"
+                @click="pagina--"
+              >
+                ← Anterior
+              </button>
               <span class="pag-info">{{ pagina }} / {{ totalPaginas }}</span>
-              <button class="pag-btn" :disabled="pagina === totalPaginas" @click="pagina++">Siguiente →</button>
+              <button
+                class="pag-btn"
+                :disabled="pagina === totalPaginas"
+                @click="pagina++"
+              >
+                Siguiente →
+              </button>
             </div>
           </div>
-
         </template>
       </template>
 
@@ -177,61 +321,110 @@
       <template v-else>
         <CalendarioReservas :reservas="reservas" />
       </template>
-
     </div>
 
     <!-- MODAL NUEVA RESERVA -->
     <Teleport to="body">
-      <div v-if="modalAbierto" class="modal-overlay d-flex align-items-center justify-content-center p-3"
-        @click.self="cerrarModal">
+      <div
+        v-if="modalAbierto"
+        class="modal-overlay d-flex align-items-center justify-content-center p-3"
+        @click.self="cerrarModal"
+      >
         <div class="modal-box bg-white rounded-4 p-4 position-relative">
           <div class="modal-top-bar"></div>
           <button
             class="position-absolute border-0 rounded-2 d-flex align-items-center justify-content-center modal-close"
-            @click="cerrarModal">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            @click="cerrarModal"
+          >
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
 
-          <h3 class="fw-bold mb-1" style="font-size:17px">Nueva reserva</h3>
-          <p class="text-muted mb-4" style="font-size:12px">Busca o registra el huésped y completa los datos</p>
+          <h3 class="fw-bold mb-1" style="font-size: 17px">Nueva reserva</h3>
+          <p class="text-muted mb-4" style="font-size: 12px">
+            Busca o registra el huésped y completa los datos
+          </p>
 
           <p class="section-label">Huésped</p>
 
           <div class="d-flex gap-2 mb-3">
-            <input class="input-custom flex-grow-1" type="text" placeholder="Número de documento..."
-              v-model="busquedaDoc" @keyup.enter="buscarHuesped" />
-            <button class="btn-buscar" @click="buscarHuesped" :disabled="buscando">{{ buscando ? '...' : 'Buscar'
-              }}</button>
+            <input
+              class="input-custom flex-grow-1"
+              type="text"
+              placeholder="Número de documento..."
+              v-model="busquedaDoc"
+              @keyup.enter="buscarHuesped"
+            />
+            <button
+              class="btn-buscar"
+              @click="buscarHuesped"
+              :disabled="buscando"
+            >
+              {{ buscando ? "..." : "Buscar" }}
+            </button>
           </div>
 
-          <div v-if="mensajeBusqueda" class="mb-3 rounded-3 px-3 py-2" :style="huespedEncontrado
-            ? 'background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.2);color:#15803d;font-size:13px'
-            : 'background:rgba(99,32,238,0.06);border:1px solid rgba(99,32,238,0.15);color:#6320EE;font-size:13px'">
+          <div
+            v-if="mensajeBusqueda"
+            class="mb-3 rounded-3 px-3 py-2"
+            :style="
+              huespedEncontrado
+                ? 'background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.2);color:#15803d;font-size:13px'
+                : 'background:rgba(99,32,238,0.06);border:1px solid rgba(99,32,238,0.15);color:#6320EE;font-size:13px'
+            "
+          >
             {{ mensajeBusqueda }}
           </div>
 
           <div class="row g-3 mb-4">
             <div class="col-6">
               <label class="form-label-custom">Nombre</label>
-              <input class="input-custom w-100" v-model="formHuesped.nombre" placeholder="Nombre" />
+              <input
+                class="input-custom w-100"
+                v-model="formHuesped.nombre"
+                placeholder="Nombre"
+              />
             </div>
             <div class="col-6">
               <label class="form-label-custom">Apellido</label>
-              <input class="input-custom w-100" v-model="formHuesped.apellido" placeholder="Apellido" />
+              <input
+                class="input-custom w-100"
+                v-model="formHuesped.apellido"
+                placeholder="Apellido"
+              />
             </div>
             <div class="col-6" v-if="!huespedEncontrado">
               <label class="form-label-custom">Documento</label>
-              <input class="input-custom w-100" v-model="formHuesped.documento" placeholder="Documento" />
+              <input
+                class="input-custom w-100"
+                v-model="formHuesped.documento"
+                placeholder="Documento"
+              />
             </div>
             <div class="col-6">
               <label class="form-label-custom">Teléfono</label>
-              <input class="input-custom w-100" v-model="formHuesped.telefono" placeholder="Teléfono" />
+              <input
+                class="input-custom w-100"
+                v-model="formHuesped.telefono"
+                placeholder="Teléfono"
+              />
             </div>
             <div class="col-12">
               <label class="form-label-custom">Email</label>
-              <input class="input-custom w-100" v-model="formHuesped.email" placeholder="Email" type="email" />
+              <input
+                class="input-custom w-100"
+                v-model="formHuesped.email"
+                placeholder="Email"
+                type="email"
+              />
             </div>
           </div>
 
@@ -239,33 +432,68 @@
           <div class="row g-3">
             <div class="col-12">
               <label class="form-label-custom">Habitación disponible</label>
-              <select class="input-custom w-100" v-model="formReserva.id_habitacion">
+              <select
+                class="input-custom w-100"
+                v-model="formReserva.id_habitacion"
+              >
                 <option value="" disabled>Selecciona una habitación</option>
-                <option v-for="h in habitacionesDisponibles" :key="h.id_habitacion" :value="h.id_habitacion">
-                  Hab. {{ h.numero }} — {{ h.tipo }} — ${{ h.precio_noche?.toLocaleString() }}/noche
+                <option
+                  v-for="h in habitacionesDisponibles"
+                  :key="h.id_habitacion"
+                  :value="h.id_habitacion"
+                >
+                  Hab. {{ h.numero }} — {{ h.tipo }} — ${{
+                    h.precio_noche?.toLocaleString()
+                  }}/noche
                 </option>
               </select>
             </div>
             <div class="col-6">
               <label class="form-label-custom">Fecha de entrada</label>
-              <input class="input-custom w-100" type="date" v-model="formReserva.fecha_entrada" :min="hoy" />
+              <input
+                class="input-custom w-100"
+                type="date"
+                v-model="formReserva.fecha_entrada"
+                :min="hoy"
+              />
             </div>
             <div class="col-6">
               <label class="form-label-custom">Fecha de salida</label>
-              <input class="input-custom w-100" type="date" v-model="formReserva.fecha_salida" :min="minFechaSalida" />
+              <input
+                class="input-custom w-100"
+                type="date"
+                v-model="formReserva.fecha_salida"
+                :min="minFechaSalida"
+              />
             </div>
           </div>
 
-          <div v-if="errorModal" class="mt-3 rounded-3 px-3 py-2"
-            style="background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);font-size:13px;color:#dc2626">
+          <div
+            v-if="errorModal"
+            class="mt-3 rounded-3 px-3 py-2"
+            style="
+              background: rgba(220, 38, 38, 0.08);
+              border: 1px solid rgba(220, 38, 38, 0.2);
+              font-size: 13px;
+              color: #dc2626;
+            "
+          >
             {{ errorModal }}
           </div>
 
           <div class="d-flex gap-2 mt-4">
-            <button class="modal-btn-secondary flex-grow-1 rounded-3" @click="cerrarModal">Cancelar</button>
-            <button class="modal-btn-primary flex-grow-1 rounded-3 border-0" @click="crearReserva"
-              :disabled="guardando">
-              {{ guardando ? 'Creando...' : 'Crear reserva' }}
+            <button
+              class="modal-btn-secondary flex-grow-1 rounded-3"
+              @click="cerrarModal"
+            >
+              Cancelar
+            </button>
+            <button
+              class="modal-btn-primary flex-grow-1 rounded-3 border-0"
+              @click="crearReserva"
+              :disabled="guardando"
+            >
+              {{ guardando ? "Creando..." : "Crear reserva" }}
             </button>
           </div>
         </div>
@@ -274,41 +502,73 @@
 
     <!-- MODAL ERROR CHECK-IN (fecha aún no llegó) -->
     <Teleport to="body">
-      <div v-if="errorCheckinModal.visible" class="modal-overlay d-flex align-items-center justify-content-center p-3"
-        @click.self="errorCheckinModal.visible = false">
-        <div class="modal-box bg-white rounded-4 p-4 position-relative" style="max-width:420px">
-          <div class="modal-top-bar" style="background:linear-gradient(90deg,#dc2626,#f87171)"></div>
+      <div
+        v-if="errorCheckinModal.visible"
+        class="modal-overlay d-flex align-items-center justify-content-center p-3"
+        @click.self="errorCheckinModal.visible = false"
+      >
+        <div
+          class="modal-box bg-white rounded-4 p-4 position-relative"
+          style="max-width: 420px"
+        >
+          <div
+            class="modal-top-bar"
+            style="background: linear-gradient(90deg, #dc2626, #f87171)"
+          ></div>
 
           <button
             class="position-absolute border-0 rounded-2 d-flex align-items-center justify-content-center modal-close"
-            @click="errorCheckinModal.visible = false">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            @click="errorCheckinModal.visible = false"
+          >
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
 
           <div class="d-flex align-items-center gap-3 mb-3 mt-1">
             <div class="checkin-error-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#dc2626"
+                stroke-width="2"
+              >
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="12" />
                 <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
             </div>
             <div>
-              <h3 class="fw-bold mb-0" style="font-size:16px;color:#211A1D">Check-in no disponible</h3>
-              <p class="mb-0" style="font-size:12px;color:#9ca3af">La fecha de entrada aún no ha llegado</p>
+              <h3 class="fw-bold mb-0" style="font-size: 16px; color: #211a1d">
+                Check-in no disponible
+              </h3>
+              <p class="mb-0" style="font-size: 12px; color: #9ca3af">
+                La fecha de entrada aún no ha llegado
+              </p>
             </div>
           </div>
 
-          <p style="font-size:13px;color:#4b5563;line-height:1.6">
-            La reserva de <strong>{{ errorCheckinModal.huesped }}</strong> tiene fecha de entrada el
-            <strong>{{ errorCheckinModal.fechaEntrada }}</strong>.
-            No es posible hacer check-in antes de esa fecha.
+          <p style="font-size: 13px; color: #4b5563; line-height: 1.6">
+            La reserva de <strong>{{ errorCheckinModal.huesped }}</strong> tiene
+            fecha de entrada el
+            <strong>{{ errorCheckinModal.fechaEntrada }}</strong
+            >. No es posible hacer check-in antes de esa fecha.
           </p>
 
           <div class="d-flex mt-4">
-            <button class="modal-btn-primary flex-grow-1 rounded-3 border-0" @click="errorCheckinModal.visible = false">
+            <button
+              class="modal-btn-primary flex-grow-1 rounded-3 border-0"
+              @click="errorCheckinModal.visible = false"
+            >
               Entendido
             </button>
           </div>
@@ -317,259 +577,412 @@
     </Teleport>
 
     <!-- MODAL CONFIRMAR CANCELAR -->
-    <ModalFormulario v-if="modalCancelar" titulo="¿Cancelar reserva?"
+    <ModalFormulario
+      v-if="modalCancelar"
+      titulo="¿Cancelar reserva?"
       :subtitulo="`Se cancelará la reserva de ${reservaACancelar?.huesped?.nombre} ${reservaACancelar?.huesped?.apellido} — Hab. ${reservaACancelar?.habitacion?.numero}.`"
-      :cargando="procesando !== null" textoConfirmar="Cancelar reserva" :peligroso="true"
-      @cerrar="modalCancelar = false" @confirmar="cancelar" />
-
+      :cargando="procesando !== null"
+      textoConfirmar="Cancelar reserva"
+      :peligroso="true"
+      @cerrar="modalCancelar = false"
+      @confirmar="cancelar"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import ModalFormulario from '@/components/ModalFormulario.vue'
-import CalendarioReservas from '@/components/Calendarioreservas.vue'
-import { checkoutStore } from '@/services/checkoutService.js'
+import { ref, computed, onMounted } from "vue";
+import ModalFormulario from "@/components/ModalFormulario.vue";
+import CalendarioReservas from "@/components/Calendarioreservas.vue";
+import { checkoutStore } from "@/services/checkoutService.js";
 
-const emit = defineEmits(['reserva-actualizada', 'checkin-iniciado'])
+const emit = defineEmits(["reserva-actualizada", "checkin-iniciado"]);
 
-const API_URL = import.meta.env.VITE_API_URL
-const POR_PAGINA = 15
+const API_URL = import.meta.env.VITE_API_URL;
+const POR_PAGINA = 15;
 
-const reservas = ref([])
-const habitaciones = ref([])
-const cargando = ref(false)
-const procesando = ref(null)
-const guardando = ref(false)
-const pagina = ref(1)
-const vistaActual = ref('tabla')
+const reservas = ref([]);
+const habitaciones = ref([]);
+const cargando = ref(false);
+const procesando = ref(null);
+const guardando = ref(false);
+const pagina = ref(1);
+const vistaActual = ref("tabla");
 
-const modalAbierto = ref(false)
-const modalCancelar = ref(false)
-const reservaACancelar = ref(null)
+const modalAbierto = ref(false);
+const modalCancelar = ref(false);
+const reservaACancelar = ref(null);
 
-const busquedaDoc = ref('')
-const buscando = ref(false)
-const huespedEncontrado = ref(false)
-const mensajeBusqueda = ref('')
-const idHuespedActual = ref(null)
-const errorModal = ref('')
+const busquedaDoc = ref("");
+const buscando = ref(false);
+const huespedEncontrado = ref(false);
+const mensajeBusqueda = ref("");
+const idHuespedActual = ref(null);
+const errorModal = ref("");
 
-const errorCheckinModal = ref({ visible: false, huesped: '', fechaEntrada: '' })
+const errorCheckinModal = ref({
+  visible: false,
+  huesped: "",
+  fechaEntrada: "",
+});
 
-const formHuesped = ref({ nombre: '', apellido: '', documento: '', telefono: '', email: '' })
-const formReserva = ref({ id_habitacion: '', fecha_entrada: '', fecha_salida: '' })
+const formHuesped = ref({
+  nombre: "",
+  apellido: "",
+  documento: "",
+  telefono: "",
+  email: "",
+});
+const formReserva = ref({
+  id_habitacion: "",
+  fecha_entrada: "",
+  fecha_salida: "",
+});
 
 const hoy = (() => {
-  const d = new Date()
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
-})()
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+})();
 
 const minFechaSalida = computed(() => {
-  if (!formReserva.value.fecha_entrada) return hoy
-  const d = new Date(formReserva.value.fecha_entrada)
-  d.setDate(d.getDate() + 1)
-  return d.toISOString().split('T')[0]
-})
+  if (!formReserva.value.fecha_entrada) return hoy;
+  const d = new Date(formReserva.value.fecha_entrada);
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().split("T")[0];
+});
 
 const habitacionesDisponibles = computed(() =>
-  habitaciones.value.filter(h => h.estado?.toUpperCase() === 'DISPONIBLE')
-)
+  habitaciones.value.filter((h) => h.estado?.toUpperCase() === "DISPONIBLE"),
+);
 
 const reservasOrdenadas = computed(() =>
-  [...reservas.value].sort((a, b) => b.id_reserva - a.id_reserva)
-)
-const totalPaginas = computed(() => Math.ceil(reservasOrdenadas.value.length / POR_PAGINA))
-const inicio = computed(() => (pagina.value - 1) * POR_PAGINA)
+  [...reservas.value].sort((a, b) => b.id_reserva - a.id_reserva),
+);
+const totalPaginas = computed(() =>
+  Math.ceil(reservasOrdenadas.value.length / POR_PAGINA),
+);
+const inicio = computed(() => (pagina.value - 1) * POR_PAGINA);
 const reservasPaginadas = computed(() =>
-  reservasOrdenadas.value.slice(inicio.value, inicio.value + POR_PAGINA)
-)
+  reservasOrdenadas.value.slice(inicio.value, inicio.value + POR_PAGINA),
+);
 
-const estado = (e) => e ? e.toString().trim().toUpperCase() : ''
-const formatFecha = (f) => f ? f.split('T')[0] : '—'
+const estado = (e) => (e ? e.toString().trim().toUpperCase() : "");
+const formatFecha = (f) => (f ? f.split("T")[0] : "—");
 
 const claseEstado = (e) => ({
-  'estado-pendiente': e === 'PENDIENTE',
-  'estado-confirmada': e === 'CONFIRMADA',
-  'estado-checkin': e === 'CHECKIN',
-  'estado-finalizada': e === 'FINALIZADA',
-  'estado-cancelada': e === 'CANCELADA',
-})
+  "estado-pendiente": e === "PENDIENTE",
+  "estado-confirmada": e === "CONFIRMADA",
+  "estado-checkin": e === "CHECKIN",
+  "estado-finalizada": e === "FINALIZADA",
+  "estado-cancelada": e === "CANCELADA",
+});
 
 const authHeaders = () => {
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token')
-  if (!token) throw new Error('No hay token')
-  return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
-}
+  const token =
+    localStorage.getItem("token") || sessionStorage.getItem("token");
+  if (!token) throw new Error("No hay token");
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+};
 
-const esperar = (ms) => new Promise(r => setTimeout(r, ms))
+const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const cargarReservas = async () => {
-  cargando.value = true
+  cargando.value = true;
   try {
-    const res = await fetch(`${API_URL}/reservas`, { headers: authHeaders() })
-    let reservasData = await res.json()
+    const res = await fetch(`${API_URL}/reservas`, { headers: authHeaders() });
+    let reservasData = await res.json();
     await Promise.all(
       reservasData
-        .filter(r => r.id_huesped)
-        .map(async r => {
+        .filter((r) => r.id_huesped)
+        .map(async (r) => {
           try {
-            const resH = await fetch(`${API_URL}/huespedes/${r.id_huesped}`, { headers: authHeaders() })
+            const resH = await fetch(`${API_URL}/huespedes/${r.id_huesped}`, {
+              headers: authHeaders(),
+            });
             if (resH.ok) {
-              const hd = await resH.json()
-              r.huesped = { ...r.huesped, ...(Array.isArray(hd) ? hd[0] : hd) }
+              const hd = await resH.json();
+              r.huesped = { ...r.huesped, ...(Array.isArray(hd) ? hd[0] : hd) };
             }
-          } catch { /* silencioso */ }
-        })
-    )
-    reservas.value = reservasData
-    pagina.value = 1
-  } finally { cargando.value = false }
-}
+          } catch {
+            /* silencioso */
+          }
+        }),
+    );
+    reservas.value = reservasData;
+    pagina.value = 1;
+  } finally {
+    cargando.value = false;
+  }
+};
 
 const cargarHabitaciones = async () => {
   try {
-    const res = await fetch(`${API_URL}/habitaciones`, { headers: authHeaders() })
-    let data = await res.json()
-    const lista = Array.isArray(data) ? data : data.habitaciones || []
-    habitaciones.value = lista.sort((a, b) => Number(a.numero) - Number(b.numero))
-  } catch (e) { console.error('Error habitaciones', e) }
-}
+    const res = await fetch(`${API_URL}/habitaciones`, {
+      headers: authHeaders(),
+    });
+    let data = await res.json();
+    const lista = Array.isArray(data) ? data : data.habitaciones || [];
+    habitaciones.value = lista.sort(
+      (a, b) => Number(a.numero) - Number(b.numero),
+    );
+  } catch (e) {
+    console.error("Error habitaciones", e);
+  }
+};
 
 const abrirModal = async () => {
-  busquedaDoc.value = ''; mensajeBusqueda.value = ''; huespedEncontrado.value = false
-  idHuespedActual.value = null; errorModal.value = ''
-  formHuesped.value = { nombre: '', apellido: '', documento: '', telefono: '', email: '' }
-  formReserva.value = { id_habitacion: '', fecha_entrada: '', fecha_salida: '' }
-  await cargarHabitaciones()
-  modalAbierto.value = true
-}
+  busquedaDoc.value = "";
+  mensajeBusqueda.value = "";
+  huespedEncontrado.value = false;
+  idHuespedActual.value = null;
+  errorModal.value = "";
+  formHuesped.value = {
+    nombre: "",
+    apellido: "",
+    documento: "",
+    telefono: "",
+    email: "",
+  };
+  formReserva.value = {
+    id_habitacion: "",
+    fecha_entrada: "",
+    fecha_salida: "",
+  };
+  await cargarHabitaciones();
+  modalAbierto.value = true;
+};
 
-const cerrarModal = () => { modalAbierto.value = false }
+const cerrarModal = () => {
+  modalAbierto.value = false;
+};
 
 const buscarHuesped = async () => {
-  if (!busquedaDoc.value.trim()) return
-  buscando.value = true; mensajeBusqueda.value = ''; huespedEncontrado.value = false; idHuespedActual.value = null
+  if (!busquedaDoc.value.trim()) return;
+  buscando.value = true;
+  mensajeBusqueda.value = "";
+  huespedEncontrado.value = false;
+  idHuespedActual.value = null;
   try {
-    const res = await fetch(`${API_URL}/huespedes/${busquedaDoc.value.trim()}`, { headers: authHeaders() })
+    const res = await fetch(
+      `${API_URL}/huespedes/${busquedaDoc.value.trim()}`,
+      { headers: authHeaders() },
+    );
     if (res.ok) {
-      const data = await res.json()
-      const h = Array.isArray(data) ? data[0] : data
-      formHuesped.value = { nombre: h.nombre || '', apellido: h.apellido || '', documento: h.documento || '', telefono: h.telefono || '', email: h.email || '' }
-      idHuespedActual.value = h.id_huesped; huespedEncontrado.value = true
-      mensajeBusqueda.value = `✓ Huésped encontrado: ${h.nombre} ${h.apellido}`
+      const data = await res.json();
+      const h = Array.isArray(data) ? data[0] : data;
+      formHuesped.value = {
+        nombre: h.nombre || "",
+        apellido: h.apellido || "",
+        documento: h.documento || "",
+        telefono: h.telefono || "",
+        email: h.email || "",
+      };
+      idHuespedActual.value = h.id_huesped;
+      huespedEncontrado.value = true;
+      mensajeBusqueda.value = `✓ Huésped encontrado: ${h.nombre} ${h.apellido}`;
     } else {
-      formHuesped.value = { nombre: '', apellido: '', documento: busquedaDoc.value.trim(), telefono: '', email: '' }
-      mensajeBusqueda.value = 'Huésped no encontrado. Completa los datos para registrarlo.'
+      formHuesped.value = {
+        nombre: "",
+        apellido: "",
+        documento: busquedaDoc.value.trim(),
+        telefono: "",
+        email: "",
+      };
+      mensajeBusqueda.value =
+        "Huésped no encontrado. Completa los datos para registrarlo.";
     }
-  } catch { mensajeBusqueda.value = 'Error al buscar. Intenta de nuevo.' }
-  finally { buscando.value = false }
-}
+  } catch {
+    mensajeBusqueda.value = "Error al buscar. Intenta de nuevo.";
+  } finally {
+    buscando.value = false;
+  }
+};
 
 const crearReserva = async () => {
   errorModal.value = ''
   const { nombre, apellido, documento, telefono, email } = formHuesped.value
   const { id_habitacion, fecha_entrada, fecha_salida } = formReserva.value
+
   if (!nombre || !apellido) { errorModal.value = 'Nombre y apellido del huésped son obligatorios.'; return }
   if (!huespedEncontrado.value && !documento) { errorModal.value = 'El documento es obligatorio para registrar un huésped nuevo.'; return }
   if (!id_habitacion || !fecha_entrada || !fecha_salida) { errorModal.value = 'Completa todos los datos de la reserva.'; return }
   if (new Date(fecha_salida) <= new Date(fecha_entrada)) { errorModal.value = 'La fecha de salida debe ser posterior a la de entrada.'; return }
+
   guardando.value = true
   try {
-    let idHuesped = idHuespedActual.value
-    if (huespedEncontrado.value) {
-      await fetch(`${API_URL}/huespedes/${idHuesped}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify({ nombre, apellido, telefono, email }) })
-    } else {
-      const resH = await fetch(`${API_URL}/huespedes`, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ nombre, apellido, documento, telefono, email }) })
-      if (!resH.ok) { const err = await resH.json().catch(() => ({})); errorModal.value = err?.detail || 'Error al registrar el huésped.'; return }
-      const nuevoHuesped = await resH.json(); idHuesped = nuevoHuesped.id_huesped
+    // Construir el body según si el huésped existe o es nuevo
+    const body = {
+      id_habitacion: Number(id_habitacion),
+      fecha_entrada: fecha_entrada + 'T00:00:00',
+      fecha_salida: fecha_salida + 'T00:00:00',
+      ...(huespedEncontrado.value
+        ? { id_huesped: idHuespedActual.value }
+        : { huesped_nuevo: { nombre, apellido, documento, telefono: telefono || null, email: email || null } }
+      )
     }
-    const resR = await fetch(`${API_URL}/reservas`, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ id_habitacion: Number(id_habitacion), id_huesped: idHuesped, fecha_entrada: fecha_entrada + 'T00:00:00', fecha_salida: fecha_salida + 'T00:00:00' }) })
-    if (!resR.ok) {
-      const err = await resR.json().catch(() => ({}))
-      errorModal.value = Array.isArray(err?.detail) ? err.detail.map(e => e.msg).join(' | ') : (err?.detail || 'Error al crear la reserva.')
+
+    const res = await fetch(`${API_URL}/reservas`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify(body)
+    })
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      errorModal.value = Array.isArray(err?.detail)
+        ? err.detail.map(e => e.msg).join(' | ')
+        : (err?.detail || 'Error al crear la reserva.')
       return
     }
-    cerrarModal(); await cargarReservas(); await cargarHabitaciones(); emit('reserva-actualizada')
-  } catch (e) { errorModal.value = 'Error de conexión: ' + e.message }
-  finally { guardando.value = false }
+
+    cerrarModal()
+    await cargarReservas()
+    await cargarHabitaciones()
+    emit('reserva-actualizada')
+  } catch (e) {
+    errorModal.value = 'Error de conexión: ' + e.message
+  } finally {
+    guardando.value = false
+  }
 }
 
 const confirmar = async (id) => {
-  procesando.value = id
+  procesando.value = id;
   try {
-    const res = await fetch(`${API_URL}/reservas/${id}/confirmar`, { method: 'PATCH', headers: authHeaders() })
-    if (!res.ok) { const err = await res.json().catch(() => ({})); alert('Error: ' + (err?.detail || res.status)); return }
-    await esperar(600); await cargarReservas(); await cargarHabitaciones(); emit('reserva-actualizada')
-  } finally { procesando.value = null }
-}
+    const res = await fetch(`${API_URL}/reservas/${id}/confirmar`, {
+      method: "PATCH",
+      headers: authHeaders(),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      alert("Error: " + (err?.detail || res.status));
+      return;
+    }
+    await esperar(600);
+    await cargarReservas();
+    await cargarHabitaciones();
+    emit("reserva-actualizada");
+  } finally {
+    procesando.value = null;
+  }
+};
 
-const prepararCancelar = (r) => { reservaACancelar.value = r; modalCancelar.value = true }
+const prepararCancelar = (r) => {
+  reservaACancelar.value = r;
+  modalCancelar.value = true;
+};
 
 const cancelar = async () => {
-  procesando.value = reservaACancelar.value.id_reserva
+  procesando.value = reservaACancelar.value.id_reserva;
   try {
-    await fetch(`${API_URL}/reservas/${reservaACancelar.value.id_reserva}/cancelar`, { method: 'PATCH', headers: authHeaders() })
-    modalCancelar.value = false; await esperar(600); await cargarReservas(); await cargarHabitaciones(); emit('reserva-actualizada')
-  } finally { procesando.value = null }
-}
+    await fetch(
+      `${API_URL}/reservas/${reservaACancelar.value.id_reserva}/cancelar`,
+      { method: "PATCH", headers: authHeaders() },
+    );
+    modalCancelar.value = false;
+    await esperar(600);
+    await cargarReservas();
+    await cargarHabitaciones();
+    emit("reserva-actualizada");
+  } finally {
+    procesando.value = null;
+  }
+};
 
 const checkin = async (reserva) => {
-  const fechaEntrada = new Date(reserva.fecha_entrada)
-  fechaEntrada.setHours(0, 0, 0, 0)
-  const hoyDate = new Date()
-  hoyDate.setHours(0, 0, 0, 0)
+  const fechaEntrada = new Date(reserva.fecha_entrada);
+  fechaEntrada.setHours(0, 0, 0, 0);
+  const hoyDate = new Date();
+  hoyDate.setHours(0, 0, 0, 0);
 
   if (fechaEntrada > hoyDate) {
     errorCheckinModal.value = {
       visible: true,
-      huesped: `${reserva.huesped?.nombre || ''} ${reserva.huesped?.apellido || ''}`.trim(),
-      fechaEntrada: fechaEntrada.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-    }
-    return
+      huesped:
+        `${reserva.huesped?.nombre || ""} ${reserva.huesped?.apellido || ""}`.trim(),
+      fechaEntrada: fechaEntrada.toLocaleDateString("es-CO", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
+    };
+    return;
   }
 
-  procesando.value = reserva.id_reserva
+  procesando.value = reserva.id_reserva;
   try {
-    const resCheckin = await fetch(`${API_URL}/reservas/${reserva.id_reserva}/checkin`, { method: 'PATCH', headers: authHeaders() })
+    const resCheckin = await fetch(
+      `${API_URL}/reservas/${reserva.id_reserva}/checkin`,
+      { method: "PATCH", headers: authHeaders() },
+    );
     if (!resCheckin.ok) {
-      const err = await resCheckin.json().catch(() => ({}))
-      const msg = err?.detail || ''
-      if (msg.toLowerCase().includes('fecha') || msg.toLowerCase().includes('date') || msg.toLowerCase().includes('antes')) {
+      const err = await resCheckin.json().catch(() => ({}));
+      const msg = err?.detail || "";
+      if (
+        msg.toLowerCase().includes("fecha") ||
+        msg.toLowerCase().includes("date") ||
+        msg.toLowerCase().includes("antes")
+      ) {
         errorCheckinModal.value = {
           visible: true,
-          huesped: `${reserva.huesped?.nombre || ''} ${reserva.huesped?.apellido || ''}`.trim(),
-          fechaEntrada: new Date(reserva.fecha_entrada).toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-        }
+          huesped:
+            `${reserva.huesped?.nombre || ""} ${reserva.huesped?.apellido || ""}`.trim(),
+          fechaEntrada: new Date(reserva.fecha_entrada).toLocaleDateString(
+            "es-CO",
+            { weekday: "long", day: "numeric", month: "long", year: "numeric" },
+          ),
+        };
       } else {
-        alert('Error en check-in: ' + (msg || resCheckin.status))
+        alert("Error en check-in: " + (msg || resCheckin.status));
       }
-      return
+      return;
     }
-    await esperar(600)
-    await cargarReservas()
-    emit('reserva-actualizada')
-    const reservaActualizada = reservas.value.find(r => r.id_reserva === reserva.id_reserva)
-    if (reservaActualizada) emit('checkin-iniciado', reservaActualizada)
-  } finally { procesando.value = null }
-}
+    await esperar(600);
+    await cargarReservas();
+    emit("reserva-actualizada");
+    const reservaActualizada = reservas.value.find(
+      (r) => r.id_reserva === reserva.id_reserva,
+    );
+    if (reservaActualizada) emit("checkin-iniciado", reservaActualizada);
+  } finally {
+    procesando.value = null;
+  }
+};
 
 const checkout = async (id) => {
   procesando.value = id
   try {
-    await fetch(`${API_URL}/reservas/${id}/checkout`, { method: 'PATCH', headers: authHeaders() })
+    const res = await fetch(`${API_URL}/reservas/${id}/checkout`, {
+      method: 'PATCH', headers: authHeaders()
+    })
+    if (!res.ok) return
+
     const idx = reservas.value.findIndex(r => r.id_reserva === id)
     if (idx !== -1) {
-      reservas.value[idx] = { ...reservas.value[idx], estado: 'FINALIZADA', fecha_salida_real: new Date().toISOString() }
+      reservas.value[idx] = {
+        ...reservas.value[idx],
+        estado: 'FINALIZADA',
+        fecha_salida_real: new Date().toISOString()
+      }
     }
     checkoutStore.marcar(id)
     emit('reserva-actualizada')
-  } finally { procesando.value = null }
+  } finally {
+    procesando.value = null
+  }
 }
-onMounted(() => { cargarReservas(); cargarHabitaciones() })
+
+onMounted(() => {
+  cargarReservas();
+  cargarHabitaciones();
+});
 </script>
 
 <style scoped>
@@ -578,16 +991,16 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   align-items: center;
   gap: 6px;
   padding: 9px 18px;
-  background: linear-gradient(135deg, #6320EE, #8075FF);
+  background: linear-gradient(135deg, #6320ee, #8075ff);
   color: #fff;
   font-size: 14px;
   font-weight: 600;
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  font-family: 'Outfit', sans-serif;
+  font-family: "Outfit", sans-serif;
   box-shadow: 0 4px 14px rgba(99, 32, 238, 0.3);
-  transition: all .2s;
+  transition: all 0.2s;
 }
 
 .btn-primary-custom:hover {
@@ -601,13 +1014,13 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   gap: 6px;
   padding: 9px 16px;
   background: none;
-  color: #6320EE;
+  color: #6320ee;
   font-size: 13px;
   font-weight: 600;
   border: 1.5px solid rgba(99, 32, 238, 0.25);
   border-radius: 10px;
   cursor: pointer;
-  font-family: 'Outfit', sans-serif;
+  font-family: "Outfit", sans-serif;
   transition: all 0.2s;
 }
 
@@ -643,7 +1056,7 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
 
 .estado-checkin {
   background: rgba(99, 32, 238, 0.12);
-  color: #6320EE;
+  color: #6320ee;
 }
 
 .estado-finalizada {
@@ -664,7 +1077,7 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: 'Outfit', sans-serif;
+  font-family: "Outfit", sans-serif;
 }
 
 .action-btn:disabled {
@@ -676,7 +1089,6 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   background: rgba(22, 163, 74, 0.1);
   color: #15803d;
   border: 1px solid rgba(99, 32, 238, 0.2);
-
 }
 
 .confirm-btn:hover {
@@ -687,7 +1099,7 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   background: rgba(220, 38, 38, 0.08);
   color: #dc2626;
   border: 1px solid rgba(220, 38, 38, 0.2);
-  transition: all .2s;
+  transition: all 0.2s;
   font-size: 13px;
   padding: 5px 12px;
   border-radius: 8px;
@@ -700,8 +1112,8 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
 
 .checkin-btn {
   background: rgba(99, 32, 238, 0.08);
-  color: #6320EE;
-  transition: all .2s;
+  color: #6320ee;
+  transition: all 0.2s;
   font-size: 13px;
   padding: 5px 12px;
   border-radius: 8px;
@@ -726,11 +1138,11 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   border-radius: 8px;
   border: 1.5px solid rgba(99, 32, 238, 0.2);
   background: none;
-  color: #6320EE;
+  color: #6320ee;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  font-family: 'Outfit', sans-serif;
+  font-family: "Outfit", sans-serif;
   transition: all 0.2s;
 }
 
@@ -790,7 +1202,7 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   transform: translateX(-50%);
   height: 4px;
   width: 90%;
-  background: linear-gradient(90deg, #6320EE, #8075FF);
+  background: linear-gradient(90deg, #6320ee, #8075ff);
   border-radius: 4px;
 }
 
@@ -816,7 +1228,7 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
 
 .btn-buscar {
   padding: 9px 18px;
-  background: linear-gradient(135deg, #6320EE, #8075FF);
+  background: linear-gradient(135deg, #6320ee, #8075ff);
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -824,7 +1236,7 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   border-radius: 10px;
   cursor: pointer;
   white-space: nowrap;
-  font-family: 'Outfit', sans-serif;
+  font-family: "Outfit", sans-serif;
   transition: all 0.2s;
 }
 
@@ -847,15 +1259,15 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   border-radius: 10px;
   padding: 9px 13px;
   font-size: 13px;
-  font-family: 'Outfit', sans-serif;
-  color: #211A1D;
+  font-family: "Outfit", sans-serif;
+  color: #211a1d;
   outline: none;
   transition: border-color 0.2s;
   background: #faf8ff;
 }
 
 .input-custom:focus {
-  border-color: #6320EE;
+  border-color: #6320ee;
 }
 
 .input-custom::placeholder {
@@ -864,10 +1276,10 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
 
 .modal-btn-primary {
   padding: 11px;
-  background: linear-gradient(135deg, #6320EE, #8075FF);
+  background: linear-gradient(135deg, #6320ee, #8075ff);
   color: #fff;
   font-size: 13px;
-  font-family: 'Outfit', sans-serif;
+  font-family: "Outfit", sans-serif;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(99, 32, 238, 0.35);
   font-weight: 600;
@@ -882,9 +1294,9 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
 .modal-btn-secondary {
   padding: 11px;
   background: #f4eeff;
-  color: #6320EE;
+  color: #6320ee;
   font-size: 13px;
-  font-family: 'Outfit', sans-serif;
+  font-family: "Outfit", sans-serif;
   border: 1.5px solid rgba(99, 32, 238, 0.18);
   cursor: pointer;
   font-weight: 600;
