@@ -23,7 +23,7 @@
             <span v-if="cantidadDesactivadas > 0" class="badge-pill-count">{{ cantidadDesactivadas }}</span>
           </button>
 
-          <button class="btn-primary-custom" @click="abrirModalCrear">
+         <button v-if="can('HABITACIONES', 'CREAR')" class="btn-primary-custom" @click="abrirModalCrear">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M12 5v14M5 12h14" />
             </svg>
@@ -79,7 +79,8 @@
                 <button class="btn-precio-cancel" @click="cancelarEdicionPrecio" title="Cancelar">✕</button>
               </div>
             </div>
-            <button v-else class="btn-editar-precio-hab" :disabled="esDesactivada(h)" @click="iniciarEdicionPrecio(h)">
+           <button v-if="can('HABITACIONES', 'EDITAR') && !esDesactivada(h)" class="btn-editar-precio-hab"
+              @click="iniciarEdicionPrecio(h)">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
@@ -87,7 +88,7 @@
               Editar precio
             </button>
 
-            <button class="action-btn delete-btn w-100 mt-1" :disabled="esDesactivada(h)" @click="confirmarEliminar(h)">
+            <button v-if="can('HABITACIONES', 'ELIMINAR')" class="action-btn delete-btn w-100 mt-1" :disabled="esDesactivada(h)" @click="confirmarEliminar(h)">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6" />
                 <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
@@ -97,7 +98,7 @@
               Eliminar
             </button>
 
-            <button v-if="esDesactivada(h)" class="btn-reactivar w-100 mt-1"
+            <button v-if="can('HABITACIONES', 'REACTIVAR') && esDesactivada(h)" class="btn-reactivar w-100 mt-1"
               :disabled="actualizando === h.id_habitacion" @click="reactivarHabitacion(h)">
               <svg v-if="actualizando !== h.id_habitacion" width="13" height="13" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2.5">
@@ -147,6 +148,8 @@
 </template>
 
 <script setup>
+import { usePermissions } from '@/composables/usePermissions'
+const { can } = usePermissions()
 import { ref, computed, onMounted, nextTick } from 'vue'
 import Habitacion_Card from '@/components/Habitacion_Card.vue'
 import ModalFormulario from '@/components/ModalFormulario.vue'

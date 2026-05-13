@@ -27,7 +27,7 @@
             </svg>
             {{ vistaActual === 'tabla' ? 'Ver calendario' : 'Ver tabla' }}
           </button>
-          <button class="btn-primary-custom" @click="abrirModal">
+          <button v-if="can('RESERVAS', 'CREAR')" class="btn-primary-custom" @click="abrirModal">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M12 5v14M5 12h14" />
             </svg>
@@ -35,6 +35,7 @@
           </button>
         </div>
       </div>
+
       <template v-if="vistaActual === 'tabla'">
         <div v-if="cargando" class="text-muted text-center py-5" style="font-size:13px">Cargando reservas...</div>
 
@@ -77,22 +78,20 @@
                   <td>
                     <div class="d-flex gap-2 flex-wrap">
                       <template v-if="estado(r.estado) === 'PENDIENTE'">
-                        <button class="action-btn confirm-btn" :disabled="procesando === r.id_reserva"
-                          @click="confirmar(r.id_reserva)">{{ procesando === r.id_reserva ? '...' : 'Confirmar'
-                          }}</button>
-                        <button class="action-btn cancel-btn" :disabled="procesando === r.id_reserva"
+                        <button v-if="can('RESERVAS', 'EDITAR')" class="action-btn confirm-btn" :disabled="procesando === r.id_reserva"
+                          @click="confirmar(r.id_reserva)">{{ procesando === r.id_reserva ? '...' : 'Confirmar' }}</button>
+                        <button v-if="can('RESERVAS', 'ELIMINAR')" class="action-btn cancel-btn" :disabled="procesando === r.id_reserva"
                           @click="prepararCancelar(r)">{{ procesando === r.id_reserva ? '...' : 'Cancelar' }}</button>
                       </template>
                       <template v-else-if="estado(r.estado) === 'CONFIRMADA'">
-                        <button class="action-btn checkin-btn" :disabled="procesando === r.id_reserva"
+                        <button v-if="can('RESERVAS', 'EDITAR')" class="action-btn checkin-btn" :disabled="procesando === r.id_reserva"
                           @click="checkin(r)">{{ procesando === r.id_reserva ? '...' : 'Check-in' }}</button>
-                        <button class="action-btn cancel-btn" :disabled="procesando === r.id_reserva"
+                        <button v-if="can('RESERVAS', 'ELIMINAR')" class="action-btn cancel-btn" :disabled="procesando === r.id_reserva"
                           @click="prepararCancelar(r)">{{ procesando === r.id_reserva ? '...' : 'Cancelar' }}</button>
                       </template>
                       <template v-else-if="estado(r.estado) === 'CHECKIN'">
-                        <button class="action-btn checkout-btn" :disabled="procesando === r.id_reserva"
-                          @click="checkout(r.id_reserva)">{{ procesando === r.id_reserva ? '...' : 'Check-out'
-                          }}</button>
+                        <button v-if="can('RESERVAS', 'EDITAR')" class="action-btn checkout-btn" :disabled="procesando === r.id_reserva"
+                          @click="checkout(r.id_reserva)">{{ procesando === r.id_reserva ? '...' : 'Check-out' }}</button>
                       </template>
                       <template v-else>
                         <span class="text-muted" style="font-size:12px">Sin acciones</span>
@@ -109,45 +108,46 @@
             <div v-for="r in reservasPaginadas" :key="r.id_reserva" class="rounded-3 border p-3"
               style="border-color:rgba(99,32,238,0.1)!important">
 
-              <!-- Top: habitación + estado -->
               <div class="d-flex align-items-center justify-content-between mb-2">
                 <span class="fw-bold" style="font-size:15px">Hab. {{ r.habitacion?.numero }}</span>
                 <span class="badge-estado" :class="claseEstado(estado(r.estado))">{{ estado(r.estado) }}</span>
               </div>
 
-              <!-- Huésped -->
               <div class="mb-1" style="font-size:13px">
                 <span class="fw-semibold">{{ r.huesped?.nombre }} {{ r.huesped?.apellido }}</span>
                 <span class="text-muted ms-2">{{ r.huesped?.documento }}</span>
               </div>
 
-              <!-- Fechas -->
               <div class="d-flex gap-3 mb-2" style="font-size:12px;color:#6b7280">
                 <span>Entrada: {{ formatFecha(r.fecha_entrada) }}</span>
                 <span>Salida: {{ formatFecha(r.fecha_salida) }}</span>
               </div>
 
-              <!-- Salida real si existe -->
-              <div v-if="r.fecha_salida_real" class="mb-2" style="font-size:12px;color:#6b7280">Salida real: {{
-                formatFecha(r.fecha_salida_real) }}
+              <div v-if="r.fecha_salida_real" class="mb-2" style="font-size:12px;color:#6b7280">
+                Salida real: {{ formatFecha(r.fecha_salida_real) }}
               </div>
 
-              <!-- Acciones -->
+              <!-- ✅ CORREGIDO: v-if de permisos en mobile también -->
               <div class="d-flex gap-2 mt-2">
                 <template v-if="estado(r.estado) === 'PENDIENTE'">
-                  <button class="action-btn confirm-btn flex-grow-1" :disabled="procesando === r.id_reserva"
+                  <button v-if="can('RESERVAS', 'EDITAR')" class="action-btn confirm-btn flex-grow-1"
+                    :disabled="procesando === r.id_reserva"
                     @click="confirmar(r.id_reserva)">{{ procesando === r.id_reserva ? '...' : 'Confirmar' }}</button>
-                  <button class="action-btn cancel-btn flex-grow-1" :disabled="procesando === r.id_reserva"
+                  <button v-if="can('RESERVAS', 'ELIMINAR')" class="action-btn cancel-btn flex-grow-1"
+                    :disabled="procesando === r.id_reserva"
                     @click="prepararCancelar(r)">{{ procesando === r.id_reserva ? '...' : 'Cancelar' }}</button>
                 </template>
                 <template v-else-if="estado(r.estado) === 'CONFIRMADA'">
-                  <button class="action-btn checkin-btn flex-grow-1" :disabled="procesando === r.id_reserva"
+                  <button v-if="can('RESERVAS', 'EDITAR')" class="action-btn checkin-btn flex-grow-1"
+                    :disabled="procesando === r.id_reserva"
                     @click="checkin(r)">{{ procesando === r.id_reserva ? '...' : 'Check-in' }}</button>
-                  <button class="action-btn cancel-btn flex-grow-1" :disabled="procesando === r.id_reserva"
+                  <button v-if="can('RESERVAS', 'ELIMINAR')" class="action-btn cancel-btn flex-grow-1"
+                    :disabled="procesando === r.id_reserva"
                     @click="prepararCancelar(r)">{{ procesando === r.id_reserva ? '...' : 'Cancelar' }}</button>
                 </template>
                 <template v-else-if="estado(r.estado) === 'CHECKIN'">
-                  <button class="action-btn checkout-btn w-100" :disabled="procesando === r.id_reserva"
+                  <button v-if="can('RESERVAS', 'EDITAR')" class="action-btn checkout-btn w-100"
+                    :disabled="procesando === r.id_reserva"
                     @click="checkout(r.id_reserva)">{{ procesando === r.id_reserva ? '...' : 'Check-out' }}</button>
                 </template>
                 <template v-else>
@@ -202,8 +202,7 @@
           <div class="d-flex gap-2 mb-3">
             <input class="input-custom flex-grow-1" type="text" placeholder="Número de documento..."
               v-model="busquedaDoc" @keyup.enter="buscarHuesped" />
-            <button class="btn-buscar" @click="buscarHuesped" :disabled="buscando">{{ buscando ? '...' : 'Buscar'
-              }}</button>
+            <button class="btn-buscar" @click="buscarHuesped" :disabled="buscando">{{ buscando ? '...' : 'Buscar' }}</button>
           </div>
 
           <div v-if="mensajeBusqueda" class="mb-3 rounded-3 px-3 py-2" :style="huespedEncontrado
@@ -263,8 +262,7 @@
 
           <div class="d-flex gap-2 mt-4">
             <button class="modal-btn-secondary flex-grow-1 rounded-3" @click="cerrarModal">Cancelar</button>
-            <button class="modal-btn-primary flex-grow-1 rounded-3 border-0" @click="crearReserva"
-              :disabled="guardando">
+            <button class="modal-btn-primary flex-grow-1 rounded-3 border-0" @click="crearReserva" :disabled="guardando">
               {{ guardando ? 'Creando...' : 'Crear reserva' }}
             </button>
           </div>
@@ -272,7 +270,7 @@
       </div>
     </Teleport>
 
-    <!-- MODAL ERROR CHECK-IN (fecha aún no llegó) -->
+    <!-- MODAL ERROR CHECK-IN -->
     <Teleport to="body">
       <div v-if="errorCheckinModal.visible" class="modal-overlay d-flex align-items-center justify-content-center p-3"
         @click.self="errorCheckinModal.visible = false">
@@ -326,6 +324,8 @@
 </template>
 
 <script setup>
+import { usePermissions } from '@/composables/usePermissions'
+const { can } = usePermissions()
 import { ref, computed, onMounted } from 'vue'
 import ModalFormulario from '@/components/ModalFormulario.vue'
 import CalendarioReservas from '@/components/Calendarioreservas.vue'
@@ -569,6 +569,7 @@ const checkout = async (id) => {
     emit('reserva-actualizada')
   } finally { procesando.value = null }
 }
+
 onMounted(() => { cargarReservas(); cargarHabitaciones() })
 </script>
 
@@ -631,30 +632,11 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   text-transform: uppercase;
 }
 
-.estado-pendiente {
-  background: rgba(217, 119, 6, 0.12);
-  color: #b45309;
-}
-
-.estado-confirmada {
-  background: rgba(59, 130, 246, 0.12);
-  color: #1d4ed8;
-}
-
-.estado-checkin {
-  background: rgba(99, 32, 238, 0.12);
-  color: #6320EE;
-}
-
-.estado-finalizada {
-  background: rgba(22, 163, 74, 0.12);
-  color: #15803d;
-}
-
-.estado-cancelada {
-  background: rgba(220, 38, 38, 0.12);
-  color: #b91c1c;
-}
+.estado-pendiente  { background: rgba(217,119,6,0.12);  color: #b45309; }
+.estado-confirmada { background: rgba(59,130,246,0.12);  color: #1d4ed8; }
+.estado-checkin    { background: rgba(99,32,238,0.12);   color: #6320EE; }
+.estado-finalizada { background: rgba(22,163,74,0.12);   color: #15803d; }
+.estado-cancelada  { background: rgba(220,38,38,0.12);   color: #b91c1c; }
 
 .action-btn {
   padding: 5px 12px;
@@ -672,54 +654,17 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   cursor: not-allowed;
 }
 
-.confirm-btn {
-  background: rgba(22, 163, 74, 0.1);
-  color: #15803d;
-  border: 1px solid rgba(99, 32, 238, 0.2);
+.confirm-btn  { background: rgba(22,163,74,0.1);  color: #15803d; border: 1px solid rgba(99,32,238,0.2); }
+.confirm-btn:hover  { background: rgba(22,163,74,0.2); }
 
-}
+.cancel-btn   { background: rgba(220,38,38,0.08); color: #dc2626; border: 1px solid rgba(220,38,38,0.2); font-size: 13px; padding: 5px 12px; border-radius: 8px; }
+.cancel-btn:hover   { background: rgba(220,38,38,0.2); }
 
-.confirm-btn:hover {
-  background: rgba(22, 163, 74, 0.2);
-}
+.checkin-btn  { background: rgba(99,32,238,0.08); color: #6320EE; border: 1px solid rgba(99,32,238,0.2); font-size: 13px; padding: 5px 12px; border-radius: 8px; }
+.checkin-btn:hover  { background: rgba(99,32,238,0.2); }
 
-.cancel-btn {
-  background: rgba(220, 38, 38, 0.08);
-  color: #dc2626;
-  border: 1px solid rgba(220, 38, 38, 0.2);
-  transition: all .2s;
-  font-size: 13px;
-  padding: 5px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(220, 38, 38, 0.2);
-}
-
-.cancel-btn:hover {
-  background: rgba(220, 38, 38, 0.2);
-}
-
-.checkin-btn {
-  background: rgba(99, 32, 238, 0.08);
-  color: #6320EE;
-  transition: all .2s;
-  font-size: 13px;
-  padding: 5px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(99, 32, 238, 0.2);
-}
-
-.checkin-btn:hover {
-  background: rgba(99, 32, 238, 0.2);
-}
-
-.checkout-btn {
-  background: rgba(107, 114, 128, 0.1);
-  color: #374151;
-}
-
-.checkout-btn:hover {
-  background: rgba(107, 114, 128, 0.2);
-}
+.checkout-btn { background: rgba(107,114,128,0.1); color: #374151; }
+.checkout-btn:hover { background: rgba(107,114,128,0.2); }
 
 .pag-btn {
   padding: 6px 14px;
@@ -734,14 +679,8 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   transition: all 0.2s;
 }
 
-.pag-btn:hover:not(:disabled) {
-  background: rgba(99, 32, 238, 0.07);
-}
-
-.pag-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
+.pag-btn:hover:not(:disabled) { background: rgba(99,32,238,0.07); }
+.pag-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .pag-info {
   display: flex;
@@ -753,11 +692,9 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
 
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(33, 26, 29, 0.55);
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(33,26,29,0.55);
   backdrop-filter: blur(4px);
   z-index: 500;
 }
@@ -767,42 +704,29 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   max-width: 540px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 24px 60px rgba(33, 26, 29, 0.3);
-  animation: modalIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 24px 60px rgba(33,26,29,0.3);
+  animation: modalIn 0.3s cubic-bezier(0.22,1,0.36,1);
 }
 
 @keyframes modalIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to   { opacity: 1; transform: none; }
 }
 
 .modal-top-bar {
   position: absolute;
-  top: 0;
-  left: 50%;
+  top: 0; left: 50%;
   transform: translateX(-50%);
-  height: 4px;
-  width: 90%;
-  background: linear-gradient(90deg, #6320EE, #8075FF);
+  height: 4px; width: 90%;
+  background: linear-gradient(90deg,#6320EE,#8075FF);
   border-radius: 4px;
 }
 
 .modal-close {
-  top: 16px;
-  right: 16px;
+  top: 16px; right: 16px;
   background: #f4eeff;
-  width: 30px;
-  height: 30px;
-  color: #9ca3af;
-  cursor: pointer;
-  border: none;
+  width: 30px; height: 30px;
+  color: #9ca3af; cursor: pointer; border: none;
 }
 
 .section-label {
@@ -816,7 +740,7 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
 
 .btn-buscar {
   padding: 9px 18px;
-  background: linear-gradient(135deg, #6320EE, #8075FF);
+  background: linear-gradient(135deg,#6320EE,#8075FF);
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -828,10 +752,7 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   transition: all 0.2s;
 }
 
-.btn-buscar:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
+.btn-buscar:disabled { opacity: 0.65; cursor: not-allowed; }
 
 .form-label-custom {
   display: block;
@@ -843,7 +764,7 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
 }
 
 .input-custom {
-  border: 1.5px solid rgba(99, 32, 238, 0.15);
+  border: 1.5px solid rgba(99,32,238,0.15);
   border-radius: 10px;
   padding: 9px 13px;
   font-size: 13px;
@@ -854,30 +775,22 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   background: #faf8ff;
 }
 
-.input-custom:focus {
-  border-color: #6320EE;
-}
-
-.input-custom::placeholder {
-  color: #c4b8d0;
-}
+.input-custom:focus { border-color: #6320EE; }
+.input-custom::placeholder { color: #c4b8d0; }
 
 .modal-btn-primary {
   padding: 11px;
-  background: linear-gradient(135deg, #6320EE, #8075FF);
+  background: linear-gradient(135deg,#6320EE,#8075FF);
   color: #fff;
   font-size: 13px;
   font-family: 'Outfit', sans-serif;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(99, 32, 238, 0.35);
+  box-shadow: 0 4px 14px rgba(99,32,238,0.35);
   font-weight: 600;
   border: none;
 }
 
-.modal-btn-primary:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
+.modal-btn-primary:disabled { opacity: 0.65; cursor: not-allowed; }
 
 .modal-btn-secondary {
   padding: 11px;
@@ -885,23 +798,18 @@ onMounted(() => { cargarReservas(); cargarHabitaciones() })
   color: #6320EE;
   font-size: 13px;
   font-family: 'Outfit', sans-serif;
-  border: 1.5px solid rgba(99, 32, 238, 0.18);
+  border: 1.5px solid rgba(99,32,238,0.18);
   cursor: pointer;
   font-weight: 600;
 }
 
-.modal-btn-secondary:hover {
-  background: rgba(99, 32, 238, 0.08);
-}
+.modal-btn-secondary:hover { background: rgba(99,32,238,0.08); }
 
 .checkin-error-icon {
-  width: 44px;
-  height: 44px;
-  background: rgba(220, 38, 38, 0.1);
+  width: 44px; height: 44px;
+  background: rgba(220,38,38,0.1);
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
 </style>

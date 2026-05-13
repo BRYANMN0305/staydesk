@@ -51,11 +51,15 @@
               </td>
               <td>
                 <div class="d-flex gap-2">
+                  <!-- ✅ Detalle siempre visible, sin v-if innecesario -->
                   <button class="action-btn detail-btn" @click="verDetalle(f)">Detalle</button>
-                  <button v-if="f.estado?.toUpperCase() !== 'PAGADA'" class="action-btn pay-btn"
-                    :disabled="pagando === f.id_factura" @click="pagar(f)">
-                    <span v-if="pagando === f.id_factura" class="spinner-border spinner-border-sm me-1"
-                      role="status"></span>
+
+                  <!-- ✅ CORREGIDO: atributos en el mismo tag, bien formados -->
+                  <button v-if="can('FACTURAS', 'EDITAR') && f.estado?.toUpperCase() !== 'PAGADA'"
+                    class="action-btn pay-btn"
+                    :disabled="pagando === f.id_factura"
+                    @click="pagar(f)">
+                    <span v-if="pagando === f.id_factura" class="spinner-border spinner-border-sm me-1" role="status"></span>
                     {{ pagando === f.id_factura ? 'Pagando...' : 'Pagar' }}
                   </button>
                 </div>
@@ -78,13 +82,11 @@
             </span>
           </div>
 
-          <!-- Huésped -->
           <div class="fw-semibold mb-1" style="font-size:14px">
             {{ f.nombre_huesped }} {{ f.apellido_huesped }}
           </div>
           <div class="text-muted mb-1" style="font-size:12px">{{ f.documento_huesped }}</div>
 
-          <!-- Habitación + total -->
           <div class="d-flex justify-content-between align-items-center mb-2">
             <span style="font-size:12px;color:#6b7280">
               {{ f.numero_habitacion ? `Hab. ${f.numero_habitacion}` : '—' }}
@@ -94,11 +96,13 @@
             </span>
           </div>
 
-          <!-- Acciones -->
+          <!-- ✅ CORREGIDO: Detalle siempre visible, Pagar con v-if correcto -->
           <div class="d-flex gap-2 mt-1">
             <button class="action-btn detail-btn flex-grow-1" @click="verDetalle(f)">Detalle</button>
-            <button v-if="f.estado?.toUpperCase() !== 'PAGADA'" class="action-btn pay-btn flex-grow-1"
-              :disabled="pagando === f.id_factura" @click="pagar(f)">
+            <button v-if="can('FACTURAS', 'EDITAR') && f.estado?.toUpperCase() !== 'PAGADA'"
+              class="action-btn pay-btn flex-grow-1"
+              :disabled="pagando === f.id_factura"
+              @click="pagar(f)">
               <span v-if="pagando === f.id_factura" class="spinner-border spinner-border-sm me-1" role="status"></span>
               {{ pagando === f.id_factura ? 'Pagando...' : 'Pagar' }}
             </button>
@@ -111,7 +115,6 @@
       <Paginacion v-model="pagina" :total="facturasOrdenadas.length" etiqueta="facturas" />
 
     </template>
-
 
     <!-- Modal Detalle -->
     <Teleport to="body">
@@ -140,8 +143,7 @@
             <div class="detalle-grid">
               <div class="detalle-fila">
                 <span class="detalle-label">Huésped</span>
-                <span class="detalle-valor">{{ facturaDetalle.nombre_huesped }} {{ facturaDetalle.apellido_huesped
-                }}</span>
+                <span class="detalle-valor">{{ facturaDetalle.nombre_huesped }} {{ facturaDetalle.apellido_huesped }}</span>
               </div>
               <div class="detalle-fila">
                 <span class="detalle-label">Documento</span>
@@ -159,26 +161,19 @@
               </div>
               <div class="detalle-fila">
                 <span class="detalle-label">Reserva</span>
-                <span class="detalle-valor">{{ facturaDetalle.id_reserva ? ` #${facturaDetalle.id_reserva}` : '—'
-                }}</span>
+                <span class="detalle-valor">{{ facturaDetalle.id_reserva ? `#${facturaDetalle.id_reserva}` : '—' }}</span>
               </div>
 
-              <!-- Precio por noche -->
               <div class="detalle-fila" v-if="detalleReserva?.precio_noche">
                 <span class="detalle-label">Precio por noche</span>
                 <span class="detalle-valor">${{ Number(detalleReserva.precio_noche).toLocaleString('es-CO') }}</span>
               </div>
 
-              <!-- Cantidad de noches -->
               <div class="detalle-fila" v-if="detalleReserva?.cantidad_noches">
                 <span class="detalle-label">Noches</span>
-                <span class="detalle-valor">
-                  {{ detalleReserva.cantidad_noches }}
-                  {{ detalleReserva.cantidad_noches !== 1 ? '' : '' }}
-                </span>
+                <span class="detalle-valor">{{ detalleReserva.cantidad_noches }}</span>
               </div>
 
-              <!-- Subtotal habitación -->
               <div class="detalle-fila" v-if="detalleReserva?.precio_noche && detalleReserva?.cantidad_noches">
                 <span class="detalle-label">Subtotal habitación</span>
                 <span class="detalle-valor">
@@ -200,33 +195,33 @@
               <div class="servicios-lista">
                 <div v-for="(s, i) in detalleReserva.detalles" :key="i" class="servicio-row">
                   <span style="font-size:13px">{{ s.nombre_servicio }}</span>
-                  <span style="font-size:13px; color:#9ca3af">x{{ s.cantidad }}</span>
-                  <span style="font-size:13px; color:#9ca3af">${{ Number(s.precio_unidad).toLocaleString('es-CO') }}
-                    c/u</span>
-                  <span style="font-size:13px; font-weight:600">${{ Number(s.subtotal).toLocaleString('es-CO') }}</span>
+                  <span style="font-size:13px;color:#9ca3af">x{{ s.cantidad }}</span>
+                  <span style="font-size:13px;color:#9ca3af">${{ Number(s.precio_unidad).toLocaleString('es-CO') }} c/u</span>
+                  <span style="font-size:13px;font-weight:600">${{ Number(s.subtotal).toLocaleString('es-CO') }}</span>
                 </div>
               </div>
             </div>
 
-            <div v-else-if="detalleReserva && (!detalleReserva.detalles || detalleReserva.detalles.length === 0)"
-              class="mt-3">
+            <div v-else-if="detalleReserva && (!detalleReserva.detalles || detalleReserva.detalles.length === 0)" class="mt-3">
               <p class="section-label mb-1">Servicios adicionales</p>
               <p class="text-muted fst-italic" style="font-size:12px">Sin servicios adicionales registrados.</p>
             </div>
 
             <div class="total-box mt-3">
-              <span style="font-size:13px; color:#6b7280">Total a pagar</span>
-              <span style="font-size:22px; font-weight:700; color:#211A1D">${{
-                Number(facturaDetalle.total).toLocaleString('es-CO') }}</span>
+              <span style="font-size:13px;color:#6b7280">Total a pagar</span>
+              <span style="font-size:22px;font-weight:700;color:#211A1D">
+                ${{ Number(facturaDetalle.total).toLocaleString('es-CO') }}
+              </span>
             </div>
 
             <div class="d-flex gap-2 mt-4">
               <button class="modal-btn-secondary flex-grow-1 rounded-3" @click="cerrarDetalle">Cerrar</button>
-              <button v-if="facturaDetalle.estado?.toUpperCase() !== 'PAGADA'"
+              <!-- ✅ Botón pagar en modal también protegido por permiso -->
+              <button v-if="can('FACTURAS', 'EDITAR') && facturaDetalle.estado?.toUpperCase() !== 'PAGADA'"
                 class="modal-btn-primary flex-grow-1 rounded-3 border-0"
-                :disabled="pagando === facturaDetalle.id_factura" @click="pagarDesdeDetalle">
-                <span v-if="pagando === facturaDetalle.id_factura" class="spinner-border spinner-border-sm me-1"
-                  role="status"></span>
+                :disabled="pagando === facturaDetalle.id_factura"
+                @click="pagarDesdeDetalle">
+                <span v-if="pagando === facturaDetalle.id_factura" class="spinner-border spinner-border-sm me-1" role="status"></span>
                 {{ pagando === facturaDetalle.id_factura ? 'Procesando...' : 'Pagar factura' }}
               </button>
             </div>
@@ -239,12 +234,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { usePermissions } from '@/composables/usePermissions'
+const { can } = usePermissions()
+import { ref, computed, onMounted } from 'vue'
 import Paginacion from '@/components/Paginacion.vue'
 
 const API_URL = import.meta.env.VITE_API_URL
 const POR_PAGINA = 15
-
 
 const facturas = ref([])
 const pagando = ref(null)
@@ -261,8 +257,6 @@ const facturasOrdenadas = computed(() =>
 const facturasPaginadas = computed(() =>
   facturasOrdenadas.value.slice((pagina.value - 1) * POR_PAGINA, pagina.value * POR_PAGINA)
 )
-
-
 
 const cargar = async () => {
   cargando.value = true
@@ -409,7 +403,7 @@ onMounted(cargar)
 
 .action-btn {
   border-radius: 8px;
-  border: none;
+  border: 1px solid rgba(99, 32, 238, 0.2);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -419,8 +413,6 @@ onMounted(cargar)
   font-weight: 500;
   padding: 5px 12px;
   font-family: 'Outfit', sans-serif;
-  border: 1px solid rgba(99, 32, 238, 0.2);
-
 }
 
 .action-btn:disabled {
@@ -468,37 +460,24 @@ onMounted(cargar)
 }
 
 @keyframes modalIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to   { opacity: 1; transform: none; }
 }
 
 .modal-top-bar {
   position: absolute;
-  top: 0;
-  left: 50%;
+  top: 0; left: 50%;
   transform: translateX(-50%);
-  height: 4px;
-  width: 90%;
+  height: 4px; width: 90%;
   background: linear-gradient(90deg, #6320EE, #8075FF);
   border-radius: 4px;
 }
 
 .modal-close {
-  top: 16px;
-  right: 16px;
+  top: 16px; right: 16px;
   background: #f4eeff;
-  width: 30px;
-  height: 30px;
-  color: #9ca3af;
-  cursor: pointer;
-  border: none;
+  width: 30px; height: 30px;
+  color: #9ca3af; cursor: pointer; border: none;
 }
 
 .section-label {

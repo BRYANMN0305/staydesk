@@ -4,7 +4,13 @@
     <!-- Moneda -->
     <div class="config-card">
       <div class="card-section-title">
-        <span class="card-icon">💲</span> Moneda
+        <span class="card-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </span>
+        Moneda
       </div>
 
       <div class="price-preview-box">
@@ -18,7 +24,7 @@
       <div class="field-row mt-3">
         <div class="field-group">
           <label class="field-label">SÍMBOLO</label>
-          <input v-model="form.simbolo" class="field-input" placeholder="$" @input="emitDirty" />
+          <input v-model="form.simbolo" class="field-input" placeholder="$" @input="emitCambio" />
         </div>
         <div class="field-group">
           <label class="field-label">NOMBRE DE LA MONEDA</label>
@@ -43,11 +49,23 @@
     <!-- Impuestos -->
     <div class="config-card">
       <div class="card-section-title">
-        <span class="card-icon">📊</span> Impuestos
+        <span class="card-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6"  y1="20" x2="6"  y2="14"/>
+            <line x1="2"  y1="20" x2="22" y2="20"/>
+          </svg>
+        </span>
+        Impuestos
       </div>
 
-      <!-- Loading impuestos -->
-      <div v-if="loadingImpuestos" class="state-msg">⏳ Cargando impuestos...</div>
+      <div v-if="loadingImpuestos" class="state-msg loading-msg">
+        <svg class="spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        Cargando impuestos...
+      </div>
 
       <template v-else>
         <div class="tax-preview-box">
@@ -63,7 +81,7 @@
         <div class="field-row mt-3">
           <div class="field-group">
             <label class="field-label">NOMBRE DEL IMPUESTO</label>
-            <select v-model="impuestoForm.nombre" class="field-input" @change="emitDirty">
+            <select v-model="impuestoForm.nombre" class="field-input" @change="emitCambio">
               <option value="IVA">IVA</option>
               <option value="IGV">IGV</option>
               <option value="IVA+INC">IVA + INC</option>
@@ -74,20 +92,19 @@
           <div class="field-group">
             <label class="field-label">PORCENTAJE (%)</label>
             <input v-model.number="impuestoForm.porcentaje" class="field-input"
-              type="number" min="0" max="100" placeholder="19" @input="emitDirty" />
+              type="number" min="0" max="100" placeholder="19" @input="emitCambio" />
           </div>
         </div>
 
         <div class="field-group">
           <label class="field-label">¿APLICAR EN TODAS LAS FACTURAS?</label>
-          <select v-model="impuestoForm.aplicar" class="field-input" @change="emitDirty">
+          <select v-model="impuestoForm.aplicar" class="field-input" @change="emitCambio">
             <option value="siempre">Sí, siempre</option>
             <option value="manual">Solo cuando se indique</option>
             <option value="nunca">No aplicar</option>
           </select>
         </div>
 
-        <!-- Toggle activo/inactivo del impuesto -->
         <div class="toggle-row" v-if="impuestoActivo">
           <div>
             <p class="toggle-label">Impuesto activo</p>
@@ -103,21 +120,27 @@
 
   </div>
 
-  <div v-if="error" class="state-msg error mt-2">⚠️ {{ error }}</div>
+  <div v-if="error" class="state-msg error mt-2">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    {{ error }}
+  </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 
-const emit = defineEmits(['dirty'])
-const BASE = 'https://staydesk-apis-dev.duckdns.org'
+// ── CORREGIDO: emit usa 'cambio' para coincidir con lo que escucha el padre ─
+const emit = defineEmits(['cambio'])
+const API_URL = import.meta.env.VITE_API_URL
 
-// ── Estado ───────────────────────────────────────────
 const loadingImpuestos = ref(false)
 const error            = ref(null)
-const impuestos        = ref([])   // lista completa de GET /impuestos
+const impuestos        = ref([])
 
-// ── Moneda ───────────────────────────────────────────
 const monedasDisponibles = [
   { nombre: 'Peso Colombiano', codigo: 'COP', simbolo: '$'  },
   { nombre: 'Dólar Americano', codigo: 'USD', simbolo: '$'  },
@@ -133,39 +156,46 @@ const form = reactive({
   codigoIso:   'COP',
 })
 
+// ── CORREGIDO: todos los handlers usan emitCambio() ────────────────────────
+const emitCambio = () => emit('cambio')
+
 function onMonedaChange() {
   const found = monedasDisponibles.find(m => m.nombre === form.nombreMoneda)
   if (found) { form.codigoIso = found.codigo; form.simbolo = found.simbolo }
-  emitDirty()
+  emitCambio()
 }
 function onIsoChange() {
   const found = monedasDisponibles.find(m => m.codigo === form.codigoIso)
   if (found) { form.nombreMoneda = found.nombre; form.simbolo = found.simbolo }
-  emitDirty()
+  emitCambio()
 }
 
-// ── Impuestos ─────────────────────────────────────────
 const impuestoActivo = computed(() =>
   impuestos.value.find(i => i.activo) ?? impuestos.value[0] ?? null
 )
 
 const impuestoForm = reactive({ nombre: 'IVA', porcentaje: 19, aplicar: 'siempre' })
 
-// ── API ───────────────────────────────────────────────
+const authHeaders = () => {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  }
+}
+
 async function cargarDatos() {
-  // Cargar moneda desde /configuracion
   try {
-    const res  = await fetch(`${BASE}/configuracion`)
+    const res  = await fetch(`${API_URL}/configuracion`, { headers: authHeaders() })
     const data = await res.json()
     form.simbolo      = data.simbolo_moneda  ?? '$'
     form.nombreMoneda = data.nombre_moneda   ?? 'Peso Colombiano'
     form.codigoIso    = data.codigo_iso      ?? 'COP'
   } catch { /* silencioso, se queda con defaults */ }
 
-  // Cargar impuestos
   loadingImpuestos.value = true
   try {
-    const res  = await fetch(`${BASE}/impuestos`)
+    const res  = await fetch(`${API_URL}/impuestos`, { headers: authHeaders() })
     impuestos.value = await res.json()
     if (impuestoActivo.value) {
       impuestoForm.nombre     = impuestoActivo.value.nombre      ?? 'IVA'
@@ -183,61 +213,82 @@ async function guardar() {
   error.value = null
   try {
     // 1. Guardar moneda en configuración general
-    await fetch(`${BASE}/configuracion`, {
+    const resConfig = await fetch(`${API_URL}/configuracion`, {
       method:  'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders(),
       body: JSON.stringify({
         simbolo_moneda: form.simbolo,
         nombre_moneda:  form.nombreMoneda,
         codigo_iso:     form.codigoIso,
       }),
     })
+    if (!resConfig.ok) {
+      const err = await resConfig.json().catch(() => ({}))
+      throw new Error(err?.detail || 'Error al guardar la moneda.')
+    }
 
-    // 2. Guardar / actualizar impuesto
-    if (impuestoActivo.value?.id) {
-      await fetch(`${BASE}/impuestos/${impuestoActivo.value.id}`, {
+    // 2a. Si ya existe un impuesto, actualizarlo con PATCH /impuestos/{id}
+    if (impuestoActivo.value?.id_impuesto) {
+      const resImp = await fetch(`${API_URL}/impuestos/${impuestoActivo.value.id_impuesto}`, {
         method:  'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders(),
         body: JSON.stringify({
           nombre:     impuestoForm.nombre,
           porcentaje: impuestoForm.porcentaje,
           aplicar:    impuestoForm.aplicar,
         }),
       })
+      if (!resImp.ok) {
+        const err = await resImp.json().catch(() => ({}))
+        throw new Error(err?.detail || 'Error al actualizar el impuesto.')
+      }
+      // Actualizar valor local para que el computed lo refleje
+      const actualizado = await resImp.json().catch(() => null)
+      if (actualizado) {
+        const idx = impuestos.value.findIndex(i => i.id_impuesto === actualizado.id_impuesto)
+        if (idx !== -1) impuestos.value[idx] = actualizado
+      }
     } else {
-      // No existe aún → crear
-      const res = await fetch(`${BASE}/impuestos`, {
+      // 2b. Si no existe, crear uno nuevo con POST /impuestos
+      const resImp = await fetch(`${API_URL}/impuestos`, {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders(),
         body: JSON.stringify({
           nombre:     impuestoForm.nombre,
           porcentaje: impuestoForm.porcentaje,
           aplicar:    impuestoForm.aplicar,
         }),
       })
-      const nuevo = await res.json()
+      if (!resImp.ok) {
+        const err = await resImp.json().catch(() => ({}))
+        throw new Error(err?.detail || 'Error al crear el impuesto.')
+      }
+      const nuevo = await resImp.json()
       impuestos.value.push(nuevo)
     }
-  } catch {
-    error.value = 'Error al guardar la facturación.'
+  } catch (e) {
+    error.value = e.message || 'Error al guardar la facturación.'
+    throw e
   }
 }
 
 async function toggleImpuesto() {
   if (!impuestoActivo.value) return
-  const { id, activo } = impuestoActivo.value
+  const { id_impuesto, activo } = impuestoActivo.value
   const endpoint = activo
-    ? `${BASE}/impuestos/${id}/desactivar`
-    : `${BASE}/impuestos/${id}/reactivar`
+    ? `${API_URL}/impuestos/${id_impuesto}/desactivar`
+    : `${API_URL}/impuestos/${id_impuesto}/reactivar`
   try {
-    await fetch(endpoint, { method: 'PATCH' })
-    impuestoActivo.value.activo = !activo
+    const res = await fetch(endpoint, { method: 'PATCH', headers: authHeaders() })
+    if (!res.ok) throw new Error()
+    // Actualizar estado local sin recargar todo
+    const idx = impuestos.value.findIndex(i => i.id_impuesto === id_impuesto)
+    if (idx !== -1) impuestos.value[idx].activo = !activo
+    emitCambio()
   } catch {
     error.value = 'Error al cambiar estado del impuesto.'
   }
 }
-
-function emitDirty() { emit('dirty') }
 
 defineExpose({ guardar })
 onMounted(cargarDatos)
@@ -246,8 +297,17 @@ onMounted(cargarDatos)
 <style scoped>
 .config-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
 .config-card  { background: #fff; border-radius: 14px; padding: 24px; box-shadow: 0 1px 4px rgba(99,32,238,.06), 0 4px 16px rgba(0,0,0,.04); border: 1px solid rgba(99,32,238,.07); }
-.card-section-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-.card-icon { font-size: 17px; }
+
+.card-section-title {
+  font-size: 15px; font-weight: 700; color: #1a1a2e;
+  margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+}
+.card-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px;
+  background: rgba(99,32,238,0.08);
+  border-radius: 8px; color: #6320EE; flex-shrink: 0;
+}
 
 .price-preview-box { background: linear-gradient(135deg,rgba(99,32,238,.10),rgba(128,117,255,.06)); border: 1px solid rgba(99,32,238,.18); border-radius: 12px; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; }
 .tax-preview-box   { background: linear-gradient(135deg,rgba(180,120,10,.10),rgba(245,158,11,.05)); border: 1px solid rgba(245,158,11,.22); border-radius: 12px; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; }
@@ -273,7 +333,12 @@ onMounted(cargarDatos)
 .toggle-btn.on .toggle-knob { transform: translateX(20px); }
 
 .state-msg       { font-size: 13px; color: #8888aa; margin-top: 8px; }
-.state-msg.error { color: #dc2626; }
+.state-msg.error { color: #dc2626; display: flex; align-items: center; gap: 7px; }
+.loading-msg     { display: flex; align-items: center; gap: 7px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin .8s linear infinite; }
+
 .mt-2 { margin-top: 8px; }
 .mt-3 { margin-top: 14px; }
 

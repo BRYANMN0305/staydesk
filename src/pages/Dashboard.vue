@@ -113,6 +113,9 @@
         <Reservas v-show="activeTab === 'reservas'" @reserva-actualizada="cargarHabitaciones" @checkin-iniciado="onCheckinIniciado"/>
         <Servicios v-show="activeTab === 'servicios'" :reservas-checkin="reservasEnCheckin" @servicios-confirmados="onServiciosConfirmados"/>
         <configuracion v-if="activeTab === 'configuracion'"/>
+        <Housekeeping v-if="activeTab === 'housekeeping'"/>
+        <Mantenimiento v-if="activeTab === 'mantenimiento'"/>
+      
       </div>
     </div>
 
@@ -184,6 +187,8 @@ import Reservas from './Reservas.vue'
 import Facturas from './Facturacion.vue'
 import Reportes from './Reportes.vue'
 import configuracion from './Configuracion.vue'
+import Housekeeping from './Housekeeping.vue'
+import Mantenimiento from './Mantenimiento.vue'
 
 const router = useRouter()
 const route = useRoute()

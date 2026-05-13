@@ -120,6 +120,14 @@
                     </svg>
 
                     {{ item.label }}
+
+                    <!-- Badge alerta mantenimientos retrasados -->
+                    <span
+                        v-if="item.key === 'mantenimiento' && mantenimientosRetrasados > 0"
+                        class="mt-alerta-badge"
+                    >
+                        {{ mantenimientosRetrasados }}
+                    </span>
                 </a>
             </div>
         </nav>
@@ -150,8 +158,9 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import AppLogo from '@/components/AppLogo.vue'
-import { usePermissions } from '../../composables/usePermissions'
+import { usePermissions } from '../composables/usePermissions'
 
 defineProps({
     modelValue: Boolean,
@@ -168,7 +177,27 @@ const iniciales = nombre
     ? nombre.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
     : '??'
 
-// Lista completa con sección asignada — filterSidebarItems filtra según permisos VER del JWT
+// ── Badge mantenimientos retrasados ──────────────────────────────────────
+const mantenimientosRetrasados = ref(0)
+
+onMounted(async () => {
+    try {
+        // TODO: cuando el backend tenga el endpoint, descomentar esto:
+        // const token = localStorage.getItem('token')
+        // const res = await fetch('https://staydesk-apis-dev.duckdns.org/mantenimientos', {
+        //     headers: { Authorization: `Bearer ${token}` }
+        // })
+        // if (!res.ok) return
+        // const data = await res.json()
+        // const hoy = new Date(); hoy.setHours(0, 0, 0, 0)
+        // mantenimientosRetrasados.value = data.filter(m =>
+        //     m.estado !== 'COMPLETADO' && m.estado !== 'CANCELADO' &&
+        //     new Date(m.fecha_programada) < hoy
+        // ).length
+    } catch {}
+})
+
+// ── Menú ─────────────────────────────────────────────────────────────────
 const todosLosItems = [
     { tab: 'dashboard',     label: 'Dashboard',     section: 'Principal' },
     { tab: 'reservas',      label: 'Reservas',       section: 'Principal' },
@@ -185,14 +214,13 @@ const todosLosItems = [
     { tab: 'configuracion', label: 'Configuración',  section: 'Sistema' },
 ]
 
-// filterSidebarItems sigue filtrando por permisos del JWT — solo agregamos agrupación
 const filtered = filterSidebarItems(todosLosItems)
     .map(i => ({ key: i.tab, label: i.label, section: i.section }))
 
 const sectionOrder = ['Principal', 'Operaciones', 'Sistema']
 const menuSections = sectionOrder
     .map(label => ({ label, items: filtered.filter(i => i.section === label) }))
-    .filter(s => s.items.length > 0) // sección no visible si el rol no tiene ningún item en ella
+    .filter(s => s.items.length > 0)
 </script>
 
 <style scoped>
@@ -259,6 +287,28 @@ const menuSections = sectionOrder
 
 .logout-btn:hover {
     color: rgba(248, 240, 251, 0.7);
+}
+
+/* Badge alerta mantenimiento */
+.mt-alerta-badge {
+    margin-left: auto;
+    background: #F59E0B;
+    color: #1a1a1a;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    animation: pulse-warn 2s infinite;
+}
+
+@keyframes pulse-warn {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
 }
 
 /* Mobile */

@@ -42,7 +42,7 @@
             <span v-if="cantidadInactivos > 0" class="badge-pill-count">{{ cantidadInactivos }}</span>
           </button>
 
-          <button class="btn-primary-custom" @click="abrirModalCrear">
+<button v-if="can('HUESPEDES', 'CREAR')" class="btn-primary-custom" @click="abrirModalCrear">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M12 5v14M5 12h14" />
             </svg>
@@ -192,6 +192,8 @@
 </template>
 
 <script setup>
+import { usePermissions } from '@/composables/usePermissions'
+const { can } = usePermissions()
 import { ref, computed, onMounted } from 'vue'
 import ModalFormulario from '@/components/ModalFormulario.vue'
 

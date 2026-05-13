@@ -22,8 +22,16 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+
 const router = useRouter()
-const goBack = () => router.push('/dashboard')
+
+const goBack = () => {
+  localStorage.removeItem('token')
+  localStorage.removeItem('nombre')
+  localStorage.removeItem('rol')
+  sessionStorage.removeItem('token')
+  router.push('/login')
+}
 </script>
 
 <style scoped>

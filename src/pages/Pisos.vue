@@ -10,7 +10,8 @@
             {{ pisos.length }} piso{{ pisos.length !== 1 ? 's' : '' }} registrado{{ pisos.length !== 1 ? 's' : '' }}
           </span>
         </div>
-        <button class="btn-primary-custom" @click="abrirModalCrear">
+       <button v-if="can('PISOS', 'CREAR')" class="btn-primary-custom" @click="abrirModalCrear">
+
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="M12 5v14M5 12h14" />
           </svg>
@@ -96,7 +97,7 @@
                           : 'Observar' }}
                     </button>
 
-                    <button class="btn btn-sm btn-outline-danger" @click="confirmarEliminar(p)"
+<button v-if="can('PISOS', 'ELIMINAR')" class="btn btn-sm btn-outline-danger" @click="confirmarEliminar(p)"
                       :disabled="eliminando === p.id_piso">
 
                       {{ eliminando === p.id_piso ? '...' : 'Eliminar' }}
@@ -158,7 +159,8 @@
 </template>
 
 <script setup>
-
+import { usePermissions } from '@/composables/usePermissions'
+const { can } = usePermissions()
 import { ref, onMounted } from 'vue'
 import ModalFormulario from '@/components/ModalFormulario.vue'
 
